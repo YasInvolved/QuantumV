@@ -16,5 +16,7 @@ option(QV_BUILD_SANDBOX "Build QuantumSandbox executable" ON)
 add_subdirectory(3rdparty/SDL3)
 add_subdirectory(3rdparty/spdlog)
 
+# platform dependent dependencies
+
 add_subdirectory(QuantumV)
 add_subdirectory(QuantumSandbox)

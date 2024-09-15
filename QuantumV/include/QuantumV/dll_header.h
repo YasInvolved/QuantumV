@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef QV_SHARED
-	#ifdef QV_PLATFORM_MSVC
+	#ifdef QV_PLATFORM_WINDOWS
 		#ifdef QV_EXPORT
 			#define QV_API __declspec(dllexport)
 			#else 

@@ -3,6 +3,11 @@
 #include <SDL3/SDL.h>
 #include <string>
 
+#ifdef QV_PLATFORM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <Windows.h>
+#endif
+
 namespace QuantumV {
 	enum class WindowType {
 		WINDOWED, BORDERLESS, FULLSCREEN
@@ -16,6 +21,11 @@ namespace QuantumV {
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 
+		uint32_t getWidth() { return width; }
+		uint32_t getHeight() { return height; }
+		#ifdef QV_PLATFORM_WINDOWS
+		HWND getHWND() { return reinterpret_cast<HWND>(SDL_GetPointerProperty(SDL_GetWindowProperties(this->window_ptr), SDL_PROP_WINDOW_WIN32_HWND_POINTER, 0)); }
+		#endif
 	private:
 		SDL_Window* window_ptr;
 		std::string title;

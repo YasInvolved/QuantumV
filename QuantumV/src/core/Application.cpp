@@ -3,11 +3,19 @@
 #include "Window.h"
 #include <iostream>
 
+#ifdef QV_RENDERER_DX12
+#include "../render/DirectX12Renderer.h"
+#endif
+
 namespace QuantumV {
 	Application::Application() {
-		QV_CORE_TRACE("Creating application");
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
-		this->window = new Window("QuantumV", WindowType::WINDOWED);
+		this->window = new Window(this->name, WindowType::WINDOWED);
+		QV_CORE_TRACE("Created application window: {0} {1}x{2}", this->name, this->window->getWidth(), this->window->getHeight());
+		
+		QV_CORE_TRACE("Chosen renderer: DX12");
+		this->renderer = new DirectX12Renderer();
+		this->renderer->Init(this->window->getHWND(), this->window->getWidth(), this->window->getHeight());
 	}
 
 	Application::~Application() {

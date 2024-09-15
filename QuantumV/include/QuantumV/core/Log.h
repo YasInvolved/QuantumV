@@ -26,4 +26,4 @@ namespace QuantumV {
 #define QV_CLIENT_TRACE(...)	::QuantumV::Log::getClientLogger()->trace(__VA_ARGS__)
 #define QV_CLIENT_WARN(...)		::QuantumV::Log::getClientLogger()->warn(__VA_ARGS__)
 #define QV_CLIENT_ERROR(...)	::QuantumV::Log::getClientLogger()->error(__VA_ARGS__)
-#define QV_CORE_CRITICAL(...)	::QuantumV::Log::getClientLogger()->critical(__VA_ARGS__)
+#define QV_CLIENT_CRITICAL(...)	::QuantumV::Log::getClientLogger()->critical(__VA_ARGS__)
