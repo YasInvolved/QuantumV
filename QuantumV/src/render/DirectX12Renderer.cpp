@@ -7,6 +7,9 @@
 
 namespace QuantumV {
 	void DirectX12Renderer::Init(void* window_handle, uint32_t width, uint32_t height) {
+		this->width = width;
+		this->height = height;
+		hwnd = reinterpret_cast<HWND>(window_handle);
 		InitializePipeline();
 	}
 
@@ -35,6 +38,47 @@ namespace QuantumV {
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		this->device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&this->commandQueue));
+
+		DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
+		swapchainDesc.BufferCount = 2;
+		swapchainDesc.Width = this->width;
+		swapchainDesc.Height = this->height;
+		swapchainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapchainDesc.Stereo = FALSE;
+		swapchainDesc.SampleDesc.Count = 1;
+		swapchainDesc.SampleDesc.Quality = 0;
+		swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+		ComPtr<IDXGISwapChain1> swapchainTemp;
+		factory->CreateSwapChainForHwnd(this->commandQueue.Get(), this->hwnd, &swapchainDesc, nullptr, nullptr, &swapchainTemp);
+		factory->MakeWindowAssociation(this->hwnd, DXGI_MWA_NO_ALT_ENTER);
+		swapchainTemp.As(&this->swapchain);
+
+		this->currentFrameIndex = this->swapchain->GetCurrentBackBufferIndex();
+
+		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+		rtvHeapDesc.NumDescriptors = 2;
+		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&rtvHeap));
+		rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(rtvHeap->GetCPUDescriptorHandleForHeapStart());
+		for (uint32_t i = 0; i < 2; i++) {
+			swapchain->GetBuffer(i, IID_PPV_ARGS(&renderTargets[i]));
+			device->CreateRenderTargetView(renderTargets[i].Get(), nullptr, rtvHandle);
+			rtvHandle.ptr += rtvDescriptorSize;
+		}
+
+		device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&this->commandAllocator));
+
+		device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, this->commandAllocator.Get(), nullptr, IID_PPV_ARGS(&this->commandList));
+		this->commandList->Close();
+
+		device->CreateFence(this->fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&this->fence));
+		this->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	}
 
 	void DirectX12Renderer::Clear(float r, float g, float b, float a) {}

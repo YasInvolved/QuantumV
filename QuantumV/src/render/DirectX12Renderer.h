@@ -28,9 +28,23 @@ namespace QuantumV {
 		void Resize(uint32_t new_width, uint32_t new_height) override;
 
 	private:
+		uint32_t width, height;
+		uint32_t currentFrameIndex = 0;
+		uint32_t rtvDescriptorSize;
+		HWND hwnd;
+
 		ComPtr<IDXGIFactory7> factory;
 		ComPtr<ID3D12Device> device;
 		ComPtr<ID3D12CommandQueue> commandQueue;
+		ComPtr<IDXGISwapChain4> swapchain;
+		ComPtr<ID3D12DescriptorHeap> rtvHeap;
+		ComPtr<ID3D12Resource> renderTargets[2];
+		ComPtr<ID3D12CommandAllocator> commandAllocator;
+		ComPtr<ID3D12GraphicsCommandList> commandList;
+
+		ComPtr<ID3D12Fence> fence;
+		HANDLE fenceEvent;
+		uint64_t fenceValue = 0;
 
 		void InitializePipeline();
 	};
