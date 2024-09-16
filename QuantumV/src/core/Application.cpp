@@ -31,6 +31,7 @@ namespace QuantumV {
 					running = false;
 				}
 			}
+			this->renderer->Draw(0, 0);
 		}
 	}
 }

@@ -17,8 +17,8 @@ namespace QuantumV {
 	public:
 		void Init(void* window_handle, uint32_t width, uint32_t height) override;
 		void Clear(float r, float g, float b, float a) override;
-		void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
-		void BindPipeline(Pipeline* pipeline) override;
+		//void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+		//void BindPipeline(Pipeline* pipeline) override;
 		void Draw(int vertex_count, int start_index = 0) override;
 
 		//Shader* CreateShader(const std::string& shader_path) override;
@@ -42,11 +42,18 @@ namespace QuantumV {
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		ComPtr<ID3D12GraphicsCommandList> commandList;
 
+		ComPtr<ID3D12RootSignature> rootSignature;
+		ComPtr<ID3DBlob> vertexShader;
+		ComPtr<ID3DBlob> pixelShader;
+		ComPtr<ID3D12PipelineState> pipelineState;
+		ComPtr<ID3D12Resource> vertexBuffer;
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+
 		ComPtr<ID3D12Fence> fence;
 		HANDLE fenceEvent;
 		uint64_t fenceValue = 0;
 
-		void InitializePipeline();
+		void WaitForPreviousFrame();
 	};
 }
 
