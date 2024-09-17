@@ -2,7 +2,8 @@
 
 #ifdef QV_RENDERER_DX12
 
-#include "IRenderer.h"
+#include "../IRenderer.h"
+#include "../../util/Timer.h"
 #include <Windows.h>s
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
@@ -13,7 +14,7 @@
 using namespace Microsoft::WRL;
 
 namespace QuantumV {
-	class DirectX12Renderer : public IRenderer {
+	class DX12Renderer : public IRenderer {
 	public:
 		void Init(void* window_handle, uint32_t width, uint32_t height) override;
 		void Clear(float r, float g, float b, float a) override;
@@ -46,12 +47,22 @@ namespace QuantumV {
 		ComPtr<ID3DBlob> vertexShader;
 		ComPtr<ID3DBlob> pixelShader;
 		ComPtr<ID3D12PipelineState> pipelineState;
+
 		ComPtr<ID3D12Resource> vertexBuffer;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+
+		ComPtr<ID3D12Resource> indexBuffer;
+		D3D12_INDEX_BUFFER_VIEW indexBufferView;
+
+		ComPtr<ID3D12DescriptorHeap> cbvHeap;
+		ComPtr<ID3D12Resource> constantBuffer;
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
 		ComPtr<ID3D12Fence> fence;
 		HANDLE fenceEvent;
 		uint64_t fenceValue = 0;
+		
+		Utils::Timer frameTimer;
 
 		void WaitForPreviousFrame();
 	};

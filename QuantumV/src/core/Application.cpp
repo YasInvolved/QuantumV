@@ -4,7 +4,7 @@
 #include <iostream>
 
 #ifdef QV_RENDERER_DX12
-#include "../render/DirectX12Renderer.h"
+#include "../render/DX12/DX12Renderer.h"
 #endif
 
 namespace QuantumV {
@@ -14,7 +14,7 @@ namespace QuantumV {
 		QV_CORE_TRACE("Created application window: {0} {1}x{2}", this->name, this->window->getWidth(), this->window->getHeight());
 		
 		QV_CORE_TRACE("Chosen renderer: DX12");
-		this->renderer = new DirectX12Renderer();
+		this->renderer = new DX12Renderer();
 		this->renderer->Init(this->window->getHWND(), this->window->getWidth(), this->window->getHeight());
 	}
 

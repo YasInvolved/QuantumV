@@ -1,9 +1,11 @@
-#include "DirectX12Renderer.h"
+#include "DX12Renderer.h"
 
 #ifdef QV_RENDERER_DX12
 
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
+#include <future>
+#include <array>
 #include "d3dx12.h"
 #include "QuantumV/core/Log.h"
 
@@ -12,8 +14,33 @@ struct Vertex {
 	DirectX::XMFLOAT4 color;
 };
 
+struct ConstBuffer {
+	DirectX::XMMATRIX worldViewMatrix;
+};
+
+// TODO: Delete this triangle boilerplate
+// Vertex Buffer
+constexpr static std::array<Vertex, 8> vertices = {
+	Vertex{.position = {-0.5f, -0.5f, -0.5f}, .color = {1.0f, 0.0f, 0.0f, 1.0f}},
+	Vertex{.position = {0.5f, -0.5f, -0.5f}, .color = {0.0f, 1.0f, 0.0f, 1.0f}},
+	Vertex{.position = {0.5f, 0.5f, -0.5f}, .color = {0.0f, 0.0f, 1.0f, 1.0f}},
+	Vertex{.position = {-0.5f, 0.5f, -0.5f}, .color = {1.0f, 1.0f, 0.0f, 1.0f}},
+
+	Vertex{.position = {-0.5f, -0.5f, 0.5f}, .color = {1.0f, 0.0f, 0.0f, 1.0f}},
+	Vertex{.position = {0.5f, -0.5f, 0.5f}, .color = {0.0f, 1.0f, 0.0f, 1.0f}},
+	Vertex{.position = {0.5f, 0.5f, 0.5f}, .color = {0.0f, 0.0f, 1.0f, 1.0f}},
+	Vertex{.position = {-0.5f, 0.5f, 0.5f}, .color = {1.0f, 1.0f, 0.0f, 1.0f}},
+};
+
+constexpr static std::array<uint16_t, 12> indices = {
+	0, 1, 2, 2, 3, 0,
+	4, 5, 6, 6, 7, 4
+};
+
+ConstBuffer cbSrcData = {};
+
 namespace QuantumV {
-	void DirectX12Renderer::Init(void* window_handle, uint32_t width, uint32_t height) {
+	void DX12Renderer::Init(void* window_handle, uint32_t width, uint32_t height) {
 		this->width = width;
 		this->height = height;
 		hwnd = reinterpret_cast<HWND>(window_handle);
@@ -85,12 +112,18 @@ namespace QuantumV {
 		device->CreateFence(this->fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&this->fence));
 		this->fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
+		CD3DX12_DESCRIPTOR_RANGE cbvRange;
+		cbvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+
+		std::array<CD3DX12_ROOT_PARAMETER, 1> rootParameters;
+		rootParameters[0].InitAsDescriptorTable(1, &cbvRange, D3D12_SHADER_VISIBILITY_VERTEX);
+
 		// create root signature
 		D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
 		rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-		rootSignatureDesc.NumParameters = 0;
+		rootSignatureDesc.NumParameters = rootParameters.size();
 		rootSignatureDesc.NumStaticSamplers = 0;
-		rootSignatureDesc.pParameters = nullptr;
+		rootSignatureDesc.pParameters = rootParameters.data();
 		rootSignatureDesc.pStaticSamplers = nullptr;
 
 		ComPtr<ID3DBlob> signature;
@@ -98,51 +131,8 @@ namespace QuantumV {
 		D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
 		device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
 
-		constexpr char vertexShaderSrc[] = R"(
-				struct VSInput {
-					float3 position : POSITION;
-					float4 color : COLOR;
-				};
-
-				struct PSInput {
-					float4 position : SV_POSITION;
-					float4 color : COLOR;
-				};
-
-				PSInput VSMain(VSInput input) {
-					PSInput output;
-					output.position = float4(input.position, 1.0);
-					output.color = input.color;
-					return output;
-				}
-			)";
-
-		constexpr char pixelShaderSrc[] = R"(
-			struct PSInput {
-				float4 position : SV_POSITION;
-				float4 color : COLOR;
-			};
-
-			float4 PSMain(PSInput input) : SV_TARGET {
-				return input.color;
-			}
-		)";
-
-		ComPtr<ID3DBlob> compilation_error;
-		auto result = D3DCompile(vertexShaderSrc, sizeof(vertexShaderSrc), nullptr, nullptr, nullptr, "VSMain", "vs_5_0", 0, 0, &vertexShader, &error);
-		if (FAILED(result)) {
-			if (compilation_error != nullptr)
-				QV_CORE_ERROR("Failed to compile vertex shader: {}", reinterpret_cast<char*>(compilation_error->GetBufferPointer()));
-			else
-				QV_CORE_ERROR("Failed to compile vertex shader");
-		}
-		result = D3DCompile(pixelShaderSrc, sizeof(pixelShaderSrc), nullptr, nullptr, nullptr, "PSMain", "ps_5_0", 0, 0, &pixelShader, &compilation_error);
-		if (FAILED(result)) {
-			if (compilation_error != nullptr)
-				QV_CORE_ERROR("Failed to compile pixel shader: {}", reinterpret_cast<char*>(compilation_error->GetBufferPointer()));
-			else
-				QV_CORE_ERROR("Failed to compile pixel shader");
-		}
+		std::async(std::launch::async, D3DReadFileToBlob, L"assets/shaders/VertexShader.cso", &vertexShader);
+		std::async(std::launch::async, D3DReadFileToBlob, L"assets/shaders/PixelShader.cso", &pixelShader);
 
 		constexpr D3D12_INPUT_ELEMENT_DESC inputElementDescs[] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -166,38 +156,81 @@ namespace QuantumV {
 
 		device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState));
 
-		// TODO: Delete this triangle boilerplate
-		Vertex triangleVertices[] = {
-			{ { 0.0f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
-		};
+		// ----------------------- VERTEX BUFFER -----------------------
 
-		const uint32_t vertexBufferSize = sizeof(triangleVertices);
+		const uint32_t vertexBufferSize = sizeof(Vertex) * vertices.size();
 
-		CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_UPLOAD);
-		CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
+		CD3DX12_HEAP_PROPERTIES vertexHeapProperties(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC vertexResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
 		device->CreateCommittedResource(
-			&heapProperties,
+			&vertexHeapProperties,
 			D3D12_HEAP_FLAG_NONE,
-			&resourceDesc,
+			&vertexResourceDesc,
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&vertexBuffer)
 		);
 
 		void* vertexData;
-		CD3DX12_RANGE readRange(0, 0);
-		vertexBuffer->Map(0, &readRange, &vertexData);
-		memcpy(vertexData, triangleVertices, vertexBufferSize);
+		CD3DX12_RANGE readVertexRange(0, 0);
+		vertexBuffer->Map(0, &readVertexRange, &vertexData);
+		memcpy(vertexData, vertices.data(), vertexBufferSize);
 		vertexBuffer->Unmap(0, nullptr);
 
 		vertexBufferView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
 		vertexBufferView.SizeInBytes = vertexBufferSize;
 		vertexBufferView.StrideInBytes = sizeof(Vertex);
+
+		// ----------------------- INDEX BUFFER -----------------------
+
+		const uint32_t indexBufferSize = sizeof(uint16_t) * indices.size();
+
+		CD3DX12_HEAP_PROPERTIES indexHeapProperties(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC indexResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(indexBufferSize);
+		device->CreateCommittedResource(
+			&indexHeapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&indexResourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&indexBuffer)
+		);
+
+		void* indexData;
+		CD3DX12_RANGE readIndexRange(0, 0);
+		indexBuffer->Map(0, &readIndexRange, &indexData);
+		memcpy(indexData, indices.data(), indexBufferSize);
+		indexBuffer->Unmap(0, nullptr);
+
+		// ----------------------- CONSTANT BUFFER -----------------------
+
+		// Descriptor heap
+		D3D12_DESCRIPTOR_HEAP_DESC cbDescHeap = {};
+		cbDescHeap.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		cbDescHeap.NumDescriptors = 1;
+		cbDescHeap.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+		device->CreateDescriptorHeap(&cbDescHeap, IID_PPV_ARGS(&cbvHeap));
+
+		const uint32_t cbSize = sizeof(ConstBuffer); // one constant buffer
+		const uint32_t cbSizeAligned = (cbSize + 255) & ~255;
+
+		CD3DX12_HEAP_PROPERTIES cbHeapProperties(D3D12_HEAP_TYPE_UPLOAD);
+		CD3DX12_RESOURCE_DESC cbResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(cbSizeAligned);
+		device->CreateCommittedResource(
+			&cbHeapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&cbResourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&constantBuffer)
+		);
+
+		cbvDesc.BufferLocation = constantBuffer->GetGPUVirtualAddress();
+		cbvDesc.SizeInBytes = cbSizeAligned;
 	}
 
-	void DirectX12Renderer::Clear(float r, float g, float b, float a) {
+	void DX12Renderer::Clear(float r, float g, float b, float a) {
 		commandAllocator->Reset();
 		commandList->Reset(commandAllocator.Get(), nullptr);
 
@@ -236,7 +269,7 @@ namespace QuantumV {
 		WaitForPreviousFrame();
 	}
 
-	void DirectX12Renderer::WaitForPreviousFrame() {
+	void DX12Renderer::WaitForPreviousFrame() {
 		const uint64_t currentFenceValue = fenceValue;
 		commandQueue->Signal(fence.Get(), currentFenceValue);
 		fenceValue++;
@@ -251,7 +284,7 @@ namespace QuantumV {
 
 	//void DirectX12Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {}
 	//void DirectX12Renderer::BindPipeline(Pipeline* pipeline) {}
-	void DirectX12Renderer::Draw(int vertex_count, int start_index) {
+	void DX12Renderer::Draw(int vertex_count, int start_index) {
 		commandAllocator->Reset();
 		commandList->Reset(commandAllocator.Get(), pipelineState.Get());
 
@@ -269,6 +302,7 @@ namespace QuantumV {
 		commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 		commandList->SetGraphicsRootSignature(rootSignature.Get());
+
 		// TODO: Create viewport as it should be created
 		commandList->RSSetViewports(1, new CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)));
 		commandList->RSSetScissorRects(1, new CD3DX12_RECT(0, 0, width, height));
@@ -278,7 +312,12 @@ namespace QuantumV {
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
-		commandList->DrawInstanced(3, 1, 0, 0);
+		// bind constant buffer
+		const std::array<ID3D12DescriptorHeap*, 1> heaps = { cbvHeap.Get() };
+		commandList->SetDescriptorHeaps(heaps.size(), heaps.data());
+		commandList->SetGraphicsRootDescriptorTable(0, cbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+		commandList->DrawIndexedInstanced(indices.size(), 1, 0, 0, 0);
 
 		CD3DX12_RESOURCE_BARRIER transitionToPresent = CD3DX12_RESOURCE_BARRIER::Transition(
 			renderTargets[currentFrameIndex].Get(),
@@ -301,7 +340,7 @@ namespace QuantumV {
 	//Texture* DirectX12Renderer::CreateTexture(const std::string& texture_path) { return {}; }
 	//VertexBuffer* DirectX12Renderer::CreateVertexBuffer(const void* data, size_t size) { return {}; }
 
-	void DirectX12Renderer::Resize(uint32_t new_width, uint32_t new_height) {}
+	void DX12Renderer::Resize(uint32_t new_width, uint32_t new_height) {}
 }
 
 #endif
