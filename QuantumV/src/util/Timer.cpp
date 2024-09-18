@@ -21,4 +21,16 @@ namespace QuantumV::Utils {
 
 		return elapsed.count();
 	}
+
+	void Timer::Update() {
+		if (isRunning) {
+			TimePoint currentTime = Clock::now();
+			deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+			lastTime = currentTime;
+		}
+	}
+
+	float Timer::GetDeltaTime() const {
+		return deltaTime;
+	}
 }

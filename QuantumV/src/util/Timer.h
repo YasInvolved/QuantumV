@@ -10,11 +10,15 @@ namespace QuantumV::Utils {
 
 		void Start();
 		void Stop();
+		void Update();
 		float GetElapsedTime() const;
+		float GetDeltaTime() const;
 	private:
 		Clock clock;
 		TimePoint startTime;
 		TimePoint stopTime;
+		TimePoint lastTime;
 		bool isRunning;
+		float deltaTime;
 	};
 }

@@ -9,7 +9,7 @@ endif()
 # platform dependent definitions
 if (MSVC)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_WINDOWS QV_RENDERER_DX12)
-	target_link_libraries(QuantumV PRIVATE "D3D12.lib" "dxgi.lib" "d3dcompiler.lib")
+	target_link_libraries(QuantumV PRIVATE "D3D12.lib" "dxgi.lib" "d3dcompiler.lib" D3D12MemoryAllocator)
 endif()
 if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)

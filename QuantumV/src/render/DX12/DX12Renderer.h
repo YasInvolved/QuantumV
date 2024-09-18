@@ -29,40 +29,20 @@ namespace QuantumV {
 		void Resize(uint32_t new_width, uint32_t new_height) override;
 
 	private:
-		uint32_t width, height;
-		uint32_t currentFrameIndex = 0;
-		uint32_t rtvDescriptorSize;
-		HWND hwnd;
+		uint32_t m_width, m_height;
+		HWND m_hwnd;
+		const uint32_t m_frameCount = 3; // triple buffering
+		uint32_t m_frameIndex;
 
-		ComPtr<IDXGIFactory7> factory;
-		ComPtr<ID3D12Device> device;
-		ComPtr<ID3D12CommandQueue> commandQueue;
-		ComPtr<IDXGISwapChain4> swapchain;
-		ComPtr<ID3D12DescriptorHeap> rtvHeap;
-		ComPtr<ID3D12Resource> renderTargets[2];
-		ComPtr<ID3D12CommandAllocator> commandAllocator;
-		ComPtr<ID3D12GraphicsCommandList> commandList;
+		ComPtr<IDXGIFactory7> m_factory;
+		ComPtr<ID3D12Device10> m_device;
+		ComPtr<ID3D12CommandQueue> m_queue;
+		ComPtr<ID3D12CommandAllocator> m_commandAllocatorDirect;
 
-		ComPtr<ID3D12RootSignature> rootSignature;
-		ComPtr<ID3DBlob> vertexShader;
-		ComPtr<ID3DBlob> pixelShader;
-		ComPtr<ID3D12PipelineState> pipelineState;
+		ComPtr<IDXGISwapChain4> m_swapchain;
 
-		ComPtr<ID3D12Resource> vertexBuffer;
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-
-		ComPtr<ID3D12Resource> indexBuffer;
-		D3D12_INDEX_BUFFER_VIEW indexBufferView;
-
-		ComPtr<ID3D12DescriptorHeap> cbvHeap;
-		ComPtr<ID3D12Resource> constantBuffer;
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-
-		ComPtr<ID3D12Fence> fence;
-		HANDLE fenceEvent;
-		uint64_t fenceValue = 0;
-		
-		Utils::Timer frameTimer;
+		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
+		std::vector<ComPtr<ID3D12Resource>> m_renderTargets;
 
 		void WaitForPreviousFrame();
 	};
