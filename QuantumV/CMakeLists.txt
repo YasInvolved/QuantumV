@@ -9,10 +9,39 @@ endif()
 # platform dependent definitions
 if (MSVC)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_WINDOWS QV_RENDERER_DX12)
-	target_link_libraries(QuantumV PRIVATE "D3D12.lib" "dxgi.lib" "d3dcompiler.lib")
+	target_link_libraries(QuantumV PRIVATE "D3D12.lib" "dxgi.lib" "d3dcompiler.lib" D3D12MemoryAllocator)
 endif()
 if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)
 endif()
 
 target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared PUBLIC spdlog::spdlog)
+
+add_custom_target(CompileShaders)
+
+set(SHADER_PATH_DX12 assets/shaders/dx12)
+set(HLSL_SHADER_FILES ${SHADER_PATH_DX12}/VertexShader.hlsl ${SHADER_PATH_DX12}/PixelShader.hlsl)
+
+set_source_files_properties(${SHADER_PATH_DX12}/VertexShader.hlsl PROPERTIES ShaderType "vs_5_0")
+set_source_files_properties(${SHADER_PATH_DX12}/VertexShader.hlsl PROPERTIES EntryPoint "VSMain")
+
+set_source_files_properties(${SHADER_PATH_DX12}/PixelShader.hlsl PROPERTIES ShaderType "ps_5_0")
+set_source_files_properties(${SHADER_PATH_DX12}/PixelShader.hlsl PROPERTIES EntryPoint "PSMain")
+
+# create shader build directory
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${SHADER_PATH_DX12})
+
+foreach (FILE ${HLSL_SHADER_FILES})
+	get_filename_component(FILE_WE ${FILE} NAME_WE)
+	get_source_file_property(SHADER_TYPE ${FILE} ShaderType)
+	get_source_file_property(ENTRY_POINT ${FILE} EntryPoint)
+	add_custom_command(TARGET CompileShaders
+		COMMAND dxc -T ${SHADER_TYPE} -E ${ENTRY_POINT} -Fo ${CMAKE_BINARY_DIR}/bin/${SHADER_PATH_DX12}/${FILE_WE}.cso ${FILE}
+		MAIN_DEPENDENCY ${FILE}
+		COMMENT "Building HLSL Shader: ${FILE}"
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		VERBATIM
+	)
+endforeach()
+
+add_dependencies(QuantumV CompileShaders)

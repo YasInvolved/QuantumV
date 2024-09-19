@@ -15,6 +15,7 @@ option(QV_BUILD_SANDBOX "Build QuantumSandbox executable" ON)
 # dependencies
 add_subdirectory(3rdparty/SDL3)
 add_subdirectory(3rdparty/spdlog)
+add_subdirectory(3rdparty/D3D12MemoryAllocator)
 
 # platform dependent dependencies
 
