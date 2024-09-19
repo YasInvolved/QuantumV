@@ -309,17 +309,21 @@ namespace QuantumV {
 			);
 
 			ConstantBuffer cbFilledData = {};
-			XMMATRIX translationMatrix = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
-			XMMATRIX scaleMatrix = XMMatrixScaling(1.0f, 1.0f, 1.0f);
-			XMMATRIX rotationMatrix = XMMatrixRotationY(0);
 
-			XMMATRIX viewMatrix = XMMatrixLookAtLH({ 0.0f, 2.0f, -10.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f, 0.0f });
-			XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XM_PIDIV4, static_cast<float>(m_width / m_height), 0.1f, 1000.0f);
+			XMVECTOR eyePosition = XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
+			XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+			XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+			XMMATRIX viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+			
+			float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+			XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
 
 			XMMATRIX viewProjectionMatrix = XMMatrixMultiply(viewMatrix, projectionMatrix);
 
-			cbFilledData.viewProjectionMatrix = viewProjectionMatrix;
-			cbFilledData.modelMatrix = translationMatrix * scaleMatrix * rotationMatrix;
+			XMMATRIX modelMatrix = XMMatrixIdentity();
+
+			cbFilledData.viewProjectionMatrix = XMMatrixTranspose(viewProjectionMatrix);
+			cbFilledData.modelMatrix = XMMatrixTranspose(modelMatrix);
 
 			void* cbData;
 			CD3DX12_RANGE range(0, 0);

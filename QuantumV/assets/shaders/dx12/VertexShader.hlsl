@@ -1,7 +1,7 @@
 cbuffer ConstantBuffer : register(b0)
 {
-    matrix modelMatrix;
-    matrix viewProjectionMatrix;
+    float4x4 modelMatrix;
+    float4x4 viewProjectionMatrix;
 };
 
 struct VSInput
