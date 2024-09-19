@@ -6,6 +6,9 @@
 #include <d3dcompiler.h>
 #include <array>
 #include <future>
+#include <imgui.h>
+#include <imgui_impl_dx12.h>
+#include <imgui_impl_sdl3.h>
 #include "d3dx12.h"
 #include "QuantumV/core/Log.h"
 
@@ -22,11 +25,11 @@ struct ConstantBuffer {
 };
 
 namespace QuantumV {
-	void DirectX12Renderer::Init(void* window_handle, uint32_t width, uint32_t height) {
+	void DirectX12Renderer::Init(const Window* window, uint32_t width, uint32_t height) {
 		HRESULT result = 0;
 		m_width = width;
 		m_height = height;
-		m_hwnd = reinterpret_cast<HWND>(window_handle);
+		m_hwnd = window->getHWND();
 
 		// initialize
 		#ifdef QV_DEBUG
@@ -282,7 +285,7 @@ namespace QuantumV {
 			m_indexBufferView.Format = DXGI_FORMAT_R16_UINT;
 		}
 		
-		{
+		{ // constant buffer
 			m_cbSize = (sizeof(ConstantBuffer) + 255) & ~255;
 
 			D3D12_RESOURCE_DESC cbDesc = {};
@@ -308,29 +311,6 @@ namespace QuantumV {
 				IID_PPV_ARGS(&m_constantBuffer)
 			);
 
-			ConstantBuffer cbFilledData = {};
-
-			XMVECTOR eyePosition = XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
-			XMVECTOR focusPoint = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-			XMVECTOR upDirection = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-			XMMATRIX viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-			
-			float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-			XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
-
-			XMMATRIX viewProjectionMatrix = XMMatrixMultiply(viewMatrix, projectionMatrix);
-
-			XMMATRIX modelMatrix = XMMatrixIdentity();
-
-			cbFilledData.viewProjectionMatrix = XMMatrixTranspose(viewProjectionMatrix);
-			cbFilledData.modelMatrix = XMMatrixTranspose(modelMatrix);
-
-			void* cbData;
-			CD3DX12_RANGE range(0, 0);
-			m_constantBuffer->Map(0, &range, &cbData);
-			memcpy(cbData, &cbFilledData, sizeof(cbFilledData));
-			m_constantBuffer->Unmap(0, nullptr);
-
 			D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = {};
 			descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			descriptorHeapDesc.NumDescriptors = 1;
@@ -343,6 +323,31 @@ namespace QuantumV {
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHandle(m_constantBufferDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 			m_device->CreateConstantBufferView(&m_constantBufferView, cbvHandle);
+		}
+
+		{ // imgui
+			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+			heapDesc.NumDescriptors = 1;
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+			m_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_imguiDescriptorHeap));
+
+			ImGui::CreateContext();
+			ImGuiIO& io =  ImGui::GetIO();
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+			io.DisplaySize.x = static_cast<float>(m_width);
+			io.DisplaySize.y = static_cast<float>(m_height);
+
+			ImGui_ImplSDL3_InitForD3D(window->getSDLWindow());
+			ImGui_ImplDX12_Init(
+				m_device.Get(),
+				m_frameCount,
+				DXGI_FORMAT_R8G8B8A8_UNORM,
+				m_imguiDescriptorHeap.Get(),
+				m_imguiDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+				m_imguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+			);
 		}
 	}
 
@@ -400,7 +405,46 @@ namespace QuantumV {
 
 	//void DirectX12Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {}
 	//void DirectX12Renderer::BindPipeline(Pipeline* pipeline) {}
+
+	void DirectX12Renderer::Update() {
+		ConstantBuffer cbFilledData = {};
+
+		XMVECTOR eyePosition = XMVectorSet(m_eyePosition[0], m_eyePosition[1], m_eyePosition[2], 1.0f);
+		XMVECTOR focusPoint = XMVectorSet(m_focusPoint[0], m_focusPoint[1], m_focusPoint[2], 1.0f);
+		XMVECTOR upDirection = XMVectorSet(m_upDirection[0], m_upDirection[1], m_upDirection[2], 0.0f);
+		XMMATRIX viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+
+		float aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
+		XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
+		XMMATRIX viewProjectionMatrix = XMMatrixMultiply(viewMatrix, projectionMatrix);
+		XMMATRIX modelMatrix = XMMatrixIdentity();
+
+		cbFilledData.viewProjectionMatrix = XMMatrixTranspose(viewProjectionMatrix);
+		cbFilledData.modelMatrix = XMMatrixTranspose(modelMatrix);
+
+		void* cbData;
+		CD3DX12_RANGE range(0, 0);
+		m_constantBuffer->Map(0, &range, &cbData);
+		memcpy(cbData, &cbFilledData, sizeof(cbFilledData));
+		m_constantBuffer->Unmap(0, nullptr);
+	}
+
 	void DirectX12Renderer::Draw(int vertex_count, int start_index) {
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplSDL3_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::Begin("Cube Settings");
+		ImGui::Text("Camera");
+		ImGui::DragFloat3("Eye Position", m_eyePosition, 0.1f, 0.1f);
+		ImGui::DragFloat3("Focus Point", m_focusPoint, 0.1f, 0.1f);
+		ImGui::DragFloat3("Up Direction", m_upDirection, 0.1f, 0.1f);
+		ImGui::End();
+
+		ImGui::Render();
+
+		Update();
+
 		m_commandAllocator->Reset();
 		m_commandList->Reset(m_commandAllocator.Get(), m_pipelineState.Get());
 
@@ -428,6 +472,8 @@ namespace QuantumV {
 		m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
 		m_commandList->IASetIndexBuffer(&m_indexBufferView);
 		m_commandList->SetGraphicsRootConstantBufferView(0, m_constantBuffer->GetGPUVirtualAddress());
+		std::array<ID3D12DescriptorHeap*, 1> descriptorHeaps = { m_imguiDescriptorHeap.Get() };
+		m_commandList->SetDescriptorHeaps(1, descriptorHeaps.data());
 
 		m_commandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 
@@ -438,6 +484,8 @@ namespace QuantumV {
 		);
 
 		m_commandList->ResourceBarrier(1, &transitionToPresent);
+
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_commandList.Get());
 
 		m_commandList->Close();
 		ID3D12CommandList* commandLists[] = { m_commandList.Get() };
@@ -453,6 +501,14 @@ namespace QuantumV {
 	//VertexBuffer* DirectX12Renderer::CreateVertexBuffer(const void* data, size_t size) { return {}; }
 
 	void DirectX12Renderer::Resize(uint32_t new_width, uint32_t new_height) {}
+
+	DirectX12Renderer::~DirectX12Renderer() {
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplSDL3_Shutdown();
+		ImGui::DestroyContext();
+
+		m_device->Release();
+	}
 }
 
 #endif

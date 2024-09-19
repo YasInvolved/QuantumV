@@ -17,10 +17,12 @@ using namespace Microsoft::WRL;
 namespace QuantumV {
 	class DirectX12Renderer : public IRenderer {
 	public:
-		void Init(void* window_handle, uint32_t width, uint32_t height) override;
+		~DirectX12Renderer();
+
+		void Init(const Window* window, uint32_t width, uint32_t height) override;
 		void Clear(float r, float g, float b, float a) override;
 		//void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
-		//void BindPipeline(Pipeline* pipeline) override;
+		//void BindPipeline(Pipeline* pipeline) override;void Update()
 		void Draw(int vertex_count, int start_index = 0) override;
 
 		//Shader* CreateShader(const std::string& shader_path) override;
@@ -67,10 +69,18 @@ namespace QuantumV {
 		ComPtr<ID3D12DescriptorHeap> m_constantBufferDescriptorHeap;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC m_constantBufferView;
 
+		ComPtr<ID3D12DescriptorHeap> m_imguiDescriptorHeap;
+
+		// camera variables
+		float m_eyePosition[3] = { 0.0f, 0.0f, -5.0f };
+		float m_focusPoint[3] = { 0.0f, 0.0f, 0.0f };
+		float m_upDirection[3] = { 0.0f, 1.0f, 0.0f };
+
 		ComPtr<ID3D12Fence> m_fence;
 		HANDLE m_fenceEvent;
 		uint64_t m_fenceValue = 0;
 
+		void Update();
 		void WaitForPreviousFrame();
 	};
 }

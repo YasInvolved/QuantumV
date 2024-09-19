@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include "../core/Window.h"
 
 namespace QuantumV {
 	class IRenderer {
@@ -9,7 +10,7 @@ namespace QuantumV {
 		virtual ~IRenderer() = default;
 
 		// Initializes rendering system
-		virtual void Init(void* window_handle, uint32_t width, uint32_t height) = 0;
+		virtual void Init(const Window* window, uint32_t width, uint32_t height) = 0;
 
 		// Clears render target
 		virtual void Clear(float r, float g, float b, float a) = 0;

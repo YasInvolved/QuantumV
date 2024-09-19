@@ -15,7 +15,7 @@ if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)
 endif()
 
-target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared PUBLIC spdlog::spdlog)
+target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui PUBLIC spdlog::spdlog)
 
 add_custom_target(CompileShaders)
 

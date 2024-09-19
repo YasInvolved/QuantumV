@@ -2,6 +2,7 @@
 #include "QuantumV/core/Log.h"
 #include "Window.h"
 #include <iostream>
+#include <imgui_impl_sdl3.h>
 
 #ifdef QV_RENDERER_DX12
 #include "../render/DirectX12Renderer.h"
@@ -15,7 +16,7 @@ namespace QuantumV {
 		
 		QV_CORE_TRACE("Chosen renderer: DX12");
 		this->renderer = new DirectX12Renderer();
-		this->renderer->Init(this->window->getHWND(), this->window->getWidth(), this->window->getHeight());
+		this->renderer->Init(window, this->window->getWidth(), this->window->getHeight());
 	}
 
 	Application::~Application() {
@@ -30,6 +31,7 @@ namespace QuantumV {
 				if (event.type == SDL_EVENT_QUIT) {
 					running = false;
 				}
+				ImGui_ImplSDL3_ProcessEvent(&event); // TODO: Fix this it's only temporary
 			}
 			this->renderer->Draw(0, 0);
 		}

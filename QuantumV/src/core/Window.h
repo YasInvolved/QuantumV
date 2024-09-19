@@ -24,8 +24,9 @@ namespace QuantumV {
 		uint32_t getWidth() { return width; }
 		uint32_t getHeight() { return height; }
 		#ifdef QV_PLATFORM_WINDOWS
-		HWND getHWND() { return reinterpret_cast<HWND>(SDL_GetPointerProperty(SDL_GetWindowProperties(this->window_ptr), SDL_PROP_WINDOW_WIN32_HWND_POINTER, 0)); }
+		HWND getHWND() const { return reinterpret_cast<HWND>(SDL_GetPointerProperty(SDL_GetWindowProperties(this->window_ptr), SDL_PROP_WINDOW_WIN32_HWND_POINTER, 0)); }
 		#endif
+		SDL_Window* getSDLWindow() const { return window_ptr; }
 	private:
 		SDL_Window* window_ptr;
 		std::string title;
