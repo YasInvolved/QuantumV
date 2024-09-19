@@ -15,9 +15,9 @@
 using namespace Microsoft::WRL;
 
 namespace QuantumV {
-	class DirectX12Renderer : public IRenderer {
+	class DX12Renderer : public IRenderer {
 	public:
-		~DirectX12Renderer();
+		~DX12Renderer();
 
 		void Init(const Window* window, uint32_t width, uint32_t height) override;
 		void Clear(float r, float g, float b, float a) override;

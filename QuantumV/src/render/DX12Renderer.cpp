@@ -1,4 +1,4 @@
-#include "DirectX12Renderer.h"
+#include "DX12Renderer.h"
 
 #ifdef QV_RENDERER_DX12
 
@@ -25,7 +25,7 @@ struct ConstantBuffer {
 };
 
 namespace QuantumV {
-	void DirectX12Renderer::Init(const Window* window, uint32_t width, uint32_t height) {
+	void DX12Renderer::Init(const Window* window, uint32_t width, uint32_t height) {
 		HRESULT result = 0;
 		m_width = width;
 		m_height = height;
@@ -351,7 +351,7 @@ namespace QuantumV {
 		}
 	}
 
-	void DirectX12Renderer::Clear(float r, float g, float b, float a) {
+	void DX12Renderer::Clear(float r, float g, float b, float a) {
 		m_commandAllocator->Reset();
 		m_commandList->Reset(m_commandAllocator.Get(), nullptr);
 
@@ -390,7 +390,7 @@ namespace QuantumV {
 		WaitForPreviousFrame();
 	}
 
-	void DirectX12Renderer::WaitForPreviousFrame() {
+	void DX12Renderer::WaitForPreviousFrame() {
 		const uint64_t currentFenceValue = m_fenceValue;
 		m_commandQueue->Signal(m_fence.Get(), currentFenceValue);
 		m_fenceValue++;
@@ -403,10 +403,10 @@ namespace QuantumV {
 		m_currentFrameIndex = m_swapchain->GetCurrentBackBufferIndex();
 	}
 
-	//void DirectX12Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {}
-	//void DirectX12Renderer::BindPipeline(Pipeline* pipeline) {}
+	//void DX12Renderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {}
+	//void DX12Renderer::BindPipeline(Pipeline* pipeline) {}
 
-	void DirectX12Renderer::Update() {
+	void DX12Renderer::Update() {
 		ConstantBuffer cbFilledData = {};
 
 		XMVECTOR eyePosition = XMVectorSet(m_eyePosition[0], m_eyePosition[1], m_eyePosition[2], 1.0f);
@@ -429,7 +429,7 @@ namespace QuantumV {
 		m_constantBuffer->Unmap(0, nullptr);
 	}
 
-	void DirectX12Renderer::Draw(int vertex_count, int start_index) {
+	void DX12Renderer::Draw(int vertex_count, int start_index) {
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
@@ -496,13 +496,13 @@ namespace QuantumV {
 		WaitForPreviousFrame();
 	}
 
-	//Shader* DirectX12Renderer::CreateShader(const std::string& shader_path) { return {}; }
-	//Texture* DirectX12Renderer::CreateTexture(const std::string& texture_path) { return {}; }
-	//VertexBuffer* DirectX12Renderer::CreateVertexBuffer(const void* data, size_t size) { return {}; }
+	//Shader* DX12Renderer::CreateShader(const std::string& shader_path) { return {}; }
+	//Texture* DX12Renderer::CreateTexture(const std::string& texture_path) { return {}; }
+	//VertexBuffer* DX12Renderer::CreateVertexBuffer(const void* data, size_t size) { return {}; }
 
-	void DirectX12Renderer::Resize(uint32_t new_width, uint32_t new_height) {}
+	void DX12Renderer::Resize(uint32_t new_width, uint32_t new_height) {}
 
-	DirectX12Renderer::~DirectX12Renderer() {
+	DX12Renderer::~DX12Renderer() {
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplSDL3_Shutdown();
 		ImGui::DestroyContext();

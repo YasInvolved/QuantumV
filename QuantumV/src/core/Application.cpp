@@ -5,18 +5,18 @@
 #include <imgui_impl_sdl3.h>
 
 #ifdef QV_RENDERER_DX12
-#include "../render/DirectX12Renderer.h"
+#include "../render/DX12Renderer.h"
 #endif
 
 namespace QuantumV {
 	Application::Application() {
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
-		this->window = new Window(this->name, WindowType::WINDOWED);
-		QV_CORE_TRACE("Created application window: {0} {1}x{2}", this->name, this->window->getWidth(), this->window->getHeight());
+		m_window = new Window(m_name, WindowType::WINDOWED);
+		QV_CORE_TRACE("Created application window: {0} {1}x{2}", m_name, m_window->getWidth(), m_window->getHeight());
 		
 		QV_CORE_TRACE("Chosen renderer: DX12");
-		this->renderer = new DirectX12Renderer();
-		this->renderer->Init(window, this->window->getWidth(), this->window->getHeight());
+		m_renderer = new DX12Renderer();
+		m_renderer->Init(m_window, m_window->getWidth(), m_window->getHeight());
 	}
 
 	Application::~Application() {
@@ -33,7 +33,7 @@ namespace QuantumV {
 				}
 				ImGui_ImplSDL3_ProcessEvent(&event); // TODO: Fix this it's only temporary
 			}
-			this->renderer->Draw(0, 0);
+			m_renderer->Draw(0, 0);
 		}
 	}
 }
