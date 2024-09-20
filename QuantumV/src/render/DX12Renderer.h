@@ -10,6 +10,7 @@
 #include <vector>
 #include <wrl/client.h>
 #include <D3D12MemAlloc.h>
+#include "../utils/Timer.h"
 
 // for simplicity
 using namespace Microsoft::WRL;
@@ -76,9 +77,16 @@ namespace QuantumV {
 		float m_focusPoint[3] = { 0.0f, 0.0f, 0.0f };
 		float m_upDirection[3] = { 0.0f, 1.0f, 0.0f };
 
+		// cube variables
+		float m_position[3] = { 0.0f, 0.0f, 0.0f };
+		float m_scale[3] = { 1.0f, 1.0f, 1.0f };
+		float m_rotation[3] = { 0.0f, 0.0f, 0.0f };
+
 		ComPtr<ID3D12Fence> m_fence;
 		HANDLE m_fenceEvent;
 		uint64_t m_fenceValue = 0;
+
+		Utils::Timer m_frameTimer;
 
 		void Update();
 		void WaitForPreviousFrame();

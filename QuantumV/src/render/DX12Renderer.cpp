@@ -349,6 +349,8 @@ namespace QuantumV {
 				m_imguiDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
 			);
 		}
+
+		m_frameTimer.Start();
 	}
 
 	void DX12Renderer::Clear(float r, float g, float b, float a) {
@@ -407,8 +409,26 @@ namespace QuantumV {
 	//void DX12Renderer::BindPipeline(Pipeline* pipeline) {}
 
 	void DX12Renderer::Update() {
+		float deltaTime = m_frameTimer.GetDeltaTime();
+
+		m_rotation[1] += deltaTime * XM_PIDIV2;
+		if (m_rotation[1] >= 2.0f * XM_PI) {
+			m_rotation[1] -= 2.0f * XM_PI;
+		}
+
+		m_rotation[0] += deltaTime * XM_PI / 6.0f;
+		if (m_rotation[0] >= 2.0f * XM_PI) {
+			m_rotation[0] -= 2.0f * XM_PI;
+		}
+
 		ConstantBuffer cbFilledData = {};
 
+		// cube
+		XMMATRIX translation = XMMatrixTranslation(m_position[0], m_position[1], m_position[2]);
+		XMMATRIX scale = XMMatrixScaling(m_scale[0], m_scale[1], m_scale[2]);
+		XMMATRIX rotation = XMMatrixRotationX(m_rotation[0]) * XMMatrixRotationY(m_rotation[1]) * XMMatrixRotationZ(m_rotation[2]);
+
+		// camera
 		XMVECTOR eyePosition = XMVectorSet(m_eyePosition[0], m_eyePosition[1], m_eyePosition[2], 1.0f);
 		XMVECTOR focusPoint = XMVectorSet(m_focusPoint[0], m_focusPoint[1], m_focusPoint[2], 1.0f);
 		XMVECTOR upDirection = XMVectorSet(m_upDirection[0], m_upDirection[1], m_upDirection[2], 0.0f);
@@ -417,7 +437,7 @@ namespace QuantumV {
 		float aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
 		XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 100.0f);
 		XMMATRIX viewProjectionMatrix = XMMatrixMultiply(viewMatrix, projectionMatrix);
-		XMMATRIX modelMatrix = XMMatrixIdentity();
+		XMMATRIX modelMatrix = translation * scale * rotation;
 
 		cbFilledData.viewProjectionMatrix = XMMatrixTranspose(viewProjectionMatrix);
 		cbFilledData.modelMatrix = XMMatrixTranspose(modelMatrix);
@@ -433,8 +453,11 @@ namespace QuantumV {
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
-
-		ImGui::Begin("Cube Settings");
+		ImGui::Begin("Settings");
+		ImGui::Text("Cube");
+		ImGui::DragFloat3("Position", m_position, 0.1f);
+		ImGui::DragFloat3("Scale", m_scale, 0.1f);
+		ImGui::DragFloat3("Rotation", m_rotation, 0.1f);
 		ImGui::Text("Camera");
 		ImGui::DragFloat3("Eye Position", m_eyePosition, 0.1f, 0.1f);
 		ImGui::DragFloat3("Focus Point", m_focusPoint, 0.1f, 0.1f);
@@ -493,6 +516,7 @@ namespace QuantumV {
 
 		m_swapchain->Present(1, 0);
 
+		m_frameTimer.Update();
 		WaitForPreviousFrame();
 	}
 
