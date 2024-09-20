@@ -1,7 +1,8 @@
 if (QV_STATIC)
 	message(STATUS "Static lib not supported yet")
 else()
-	add_library(QuantumV SHARED "src/core/Application.cpp" "include/QuantumV/core/Application.h" "include/QuantumV/entry_point.h" "include/QuantumV.h" "src/core/Window.cpp" "src/core/Window.h" "include/QuantumV/dll_header.h"   "include/QuantumV/core/Log.h" "src/core/Log.cpp" "include/QuantumV/core/Base.h" "src/render/IRenderer.h" "src/render/DX12/DX12Renderer.h" "src/render/DX12/DX12Renderer.cpp" "src/util/Timer.h" "src/util/Timer.cpp")
+	add_library(QuantumV SHARED "src/core/Application.cpp" "include/QuantumV/core/Application.h" "include/QuantumV/entry_point.h" "include/QuantumV.h" "src/core/Window.cpp" "src/core/Window.h" "include/QuantumV/dll_header.h"   "include/QuantumV/core/Log.h" "src/core/Log.cpp" "include/QuantumV/core/Base.h" "src/render/IRenderer.h" "src/render/DX12Renderer.h" "src/render/DX12Renderer.cpp" "src/utils/Timer.h" "src/utils/Timer.cpp")
+
 	target_include_directories(QuantumV PUBLIC include)
 	target_compile_definitions(QuantumV PUBLIC QV_SHARED PRIVATE QV_EXPORT $<$<CONFIG:Debug>:QV_DEBUG>) # public definitions
 endif()
@@ -15,27 +16,28 @@ if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)
 endif()
 
-target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared PUBLIC spdlog::spdlog)
+target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui PUBLIC spdlog::spdlog)
 
 add_custom_target(CompileShaders)
 
-set(HLSL_SHADER_FILES assets/shaders/VertexShader.hlsl assets/shaders/PixelShader.hlsl)
+set(SHADER_PATH_DX12 assets/shaders/dx12)
+set(HLSL_SHADER_FILES ${SHADER_PATH_DX12}/VertexShader.hlsl ${SHADER_PATH_DX12}/PixelShader.hlsl)
 
-set_source_files_properties(assets/shaders/VertexShader.hlsl PROPERTIES ShaderType "vs_5_0")
-set_source_files_properties(assets/shaders/VertexShader.hlsl PROPERTIES EntryPoint "VSMain")
+set_source_files_properties(${SHADER_PATH_DX12}/VertexShader.hlsl PROPERTIES ShaderType "vs_5_0")
+set_source_files_properties(${SHADER_PATH_DX12}/VertexShader.hlsl PROPERTIES EntryPoint "VSMain")
 
-set_source_files_properties(assets/shaders/PixelShader.hlsl PROPERTIES ShaderType "ps_5_0")
-set_source_files_properties(assets/shaders/PixelShader.hlsl PROPERTIES EntryPoint "PSMain")
+set_source_files_properties(${SHADER_PATH_DX12}/PixelShader.hlsl PROPERTIES ShaderType "ps_5_0")
+set_source_files_properties(${SHADER_PATH_DX12}/PixelShader.hlsl PROPERTIES EntryPoint "PSMain")
 
 # create shader build directory
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/assets/shaders/)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${SHADER_PATH_DX12})
 
 foreach (FILE ${HLSL_SHADER_FILES})
 	get_filename_component(FILE_WE ${FILE} NAME_WE)
 	get_source_file_property(SHADER_TYPE ${FILE} ShaderType)
 	get_source_file_property(ENTRY_POINT ${FILE} EntryPoint)
 	add_custom_command(TARGET CompileShaders
-		COMMAND dxc -T ${SHADER_TYPE} -E ${ENTRY_POINT} -Fo ${CMAKE_BINARY_DIR}/bin/assets/shaders/${FILE_WE}.cso ${FILE}
+    COMMAND dxc -T ${SHADER_TYPE} -E ${ENTRY_POINT} -Fo ${CMAKE_BINARY_DIR}/bin/${SHADER_PATH_DX12}/${FILE_WE}.cso ${FILE}
 		MAIN_DEPENDENCY ${FILE}
 		COMMENT "Building HLSL Shader: ${FILE}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
