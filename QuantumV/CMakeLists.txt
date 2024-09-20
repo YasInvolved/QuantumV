@@ -2,6 +2,7 @@ if (QV_STATIC)
 	message(STATUS "Static lib not supported yet")
 else()
 	add_library(QuantumV SHARED "src/core/Application.cpp" "include/QuantumV/core/Application.h" "include/QuantumV/entry_point.h" "include/QuantumV.h" "src/core/Window.cpp" "src/core/Window.h" "include/QuantumV/dll_header.h"   "include/QuantumV/core/Log.h" "src/core/Log.cpp" "include/QuantumV/core/Base.h" "src/render/IRenderer.h" "src/render/DX12Renderer.h" "src/render/DX12Renderer.cpp" "src/utils/Timer.h" "src/utils/Timer.cpp")
+
 	target_include_directories(QuantumV PUBLIC include)
 	target_compile_definitions(QuantumV PUBLIC QV_SHARED PRIVATE QV_EXPORT $<$<CONFIG:Debug>:QV_DEBUG>) # public definitions
 endif()
@@ -36,7 +37,7 @@ foreach (FILE ${HLSL_SHADER_FILES})
 	get_source_file_property(SHADER_TYPE ${FILE} ShaderType)
 	get_source_file_property(ENTRY_POINT ${FILE} EntryPoint)
 	add_custom_command(TARGET CompileShaders
-		COMMAND dxc -T ${SHADER_TYPE} -E ${ENTRY_POINT} -Fo ${CMAKE_BINARY_DIR}/bin/${SHADER_PATH_DX12}/${FILE_WE}.cso ${FILE}
+    COMMAND dxc -T ${SHADER_TYPE} -E ${ENTRY_POINT} -Fo ${CMAKE_BINARY_DIR}/bin/${SHADER_PATH_DX12}/${FILE_WE}.cso ${FILE}
 		MAIN_DEPENDENCY ${FILE}
 		COMMENT "Building HLSL Shader: ${FILE}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

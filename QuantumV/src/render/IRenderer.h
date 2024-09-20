@@ -15,12 +15,6 @@ namespace QuantumV {
 		// Clears render target
 		virtual void Clear(float r, float g, float b, float a) = 0;
 
-		// set viewport
-		// virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
-
-		// bind pipeline (DX12 PSO or Vulkan Pipeline Layout)
-		// virtual void BindPipeline(Pipeline* pipeline) = 0;
-
 		// draw
 		virtual void Draw(int vertex_count, int start_index = 0) = 0;
 

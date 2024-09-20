@@ -6,7 +6,6 @@
 
 #ifdef QV_RENDERER_DX12
 #include "../render/DX12Renderer.h"
-#endif
 
 namespace QuantumV {
 	Application::Application() {
