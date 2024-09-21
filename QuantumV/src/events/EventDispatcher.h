@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QuantumV/core/IEvent.h>
+#include <QuantumV/core/Application.h>
+#include <QuantumV/events/IEvent.h>
 #include <unordered_map>
 #include <functional>
 #include <typeindex>
@@ -10,16 +11,12 @@ namespace QuantumV {
 
 	class EventDispatcher {
 	private:
+		Application& m_application;
 		std::unordered_map<std::type_index, EventHandlerFunction> m_handlers;
 
 	public:
-		template<typename EventType>
-		void RegisterHandler(std::function<void(EventType*)> handler) {
-			m_handlers[typeid(EventType)] = [handler](IEvent* event) {
-				handler(static_cast<EventType*>(event));
-			};
-		}
-		
+		EventDispatcher(Application& application);
+
 		void Dispatch(IEvent* event);
 	};
 }

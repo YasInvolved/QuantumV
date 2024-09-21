@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QuantumV/core/IEvent.h>
-#include <QuantumV/core/EventQueue.h>
-#include <QuantumV/core/EventDispatcher.h>
+#include <QuantumV/events/IEvent.h>
+#include <QuantumV/events/EventQueue.h>
+#include "EventDispatcher.h"
 #include <thread>
 
 namespace QuantumV {
@@ -10,8 +10,12 @@ namespace QuantumV {
 	private:
 		EventQueue& m_EventQueue;
 		EventDispatcher& m_EventDispatcher;
+
+		std::thread m_processorThread;
 	public:
 		EventProcessor(EventQueue& eventQueue, EventDispatcher& eventDispatcher);
+		~EventProcessor() { Stop(); }
 		void Start();
+		void Stop();
 	};
 }
