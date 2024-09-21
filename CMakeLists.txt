@@ -19,7 +19,7 @@ add_subdirectory(3rdparty/D3D12MemoryAllocator)
 
 add_library(imgui STATIC "3rdparty/imgui/imgui.cpp" "3rdparty/imgui/imgui_demo.cpp" "3rdparty/imgui/imgui_draw.cpp" "3rdparty/imgui/imgui_tables.cpp" "3rdparty/imgui/imgui_widgets.cpp" "3rdparty/imgui/backends/imgui_impl_dx12.cpp" "3rdparty/imgui/backends/imgui_impl_dx12.cpp" "3rdparty/imgui/backends/imgui_impl_sdl3.cpp")
 target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui" "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui/backends")
-target_link_libraries(imgui PRIVATE SDL3::Headers
+target_link_libraries(imgui PRIVATE SDL3::Headers)
 
 # platform dependent dependencies
 

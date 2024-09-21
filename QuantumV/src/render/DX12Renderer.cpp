@@ -411,6 +411,25 @@ namespace QuantumV {
 	void DX12Renderer::Update() {
 		float deltaTime = m_frameTimer.GetDeltaTime();
 
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplSDL3_NewFrame();
+
+		ImGui::NewFrame();
+
+		ImGui::Begin("Camera");
+		ImGui::DragFloat3("Eye Position", m_eyePosition, 0.1f, 0.1f);
+		ImGui::DragFloat3("Focus Point", m_focusPoint, 0.1f, 0.1f);
+		ImGui::DragFloat3("Up Direction", m_upDirection, 0.1f, 0.1f);
+		ImGui::End();
+
+		ImGui::Begin("Cube");
+		ImGui::DragFloat3("Position", m_position, 0.1f);
+		ImGui::DragFloat3("Scale", m_scale, 0.1f);
+		ImGui::DragFloat3("Rotation", m_rotation, 0.1f);
+		ImGui::End();
+
+		ImGui::Render();
+
 		m_rotation[1] += deltaTime * XM_PIDIV2;
 		if (m_rotation[1] >= 2.0f * XM_PI) {
 			m_rotation[1] -= 2.0f * XM_PI;
@@ -450,22 +469,6 @@ namespace QuantumV {
 	}
 
 	void DX12Renderer::Draw(int vertex_count, int start_index) {
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplSDL3_NewFrame();
-		ImGui::NewFrame();
-		ImGui::Begin("Settings");
-		ImGui::Text("Cube");
-		ImGui::DragFloat3("Position", m_position, 0.1f);
-		ImGui::DragFloat3("Scale", m_scale, 0.1f);
-		ImGui::DragFloat3("Rotation", m_rotation, 0.1f);
-		ImGui::Text("Camera");
-		ImGui::DragFloat3("Eye Position", m_eyePosition, 0.1f, 0.1f);
-		ImGui::DragFloat3("Focus Point", m_focusPoint, 0.1f, 0.1f);
-		ImGui::DragFloat3("Up Direction", m_upDirection, 0.1f, 0.1f);
-		ImGui::End();
-
-		ImGui::Render();
-
 		Update();
 
 		m_commandAllocator->Reset();

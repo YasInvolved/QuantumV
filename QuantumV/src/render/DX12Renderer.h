@@ -3,7 +3,7 @@
 #ifdef QV_RENDERER_DX12
 
 #include "IRenderer.h"
-#include <Windows.h>s
+#include <Windows.h>
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
 #include <dxgi1_6.h>

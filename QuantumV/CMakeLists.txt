@@ -1,7 +1,7 @@
 if (QV_STATIC)
 	message(STATUS "Static lib not supported yet")
 else()
-	add_library(QuantumV SHARED "src/core/Application.cpp" "include/QuantumV/core/Application.h" "include/QuantumV/entry_point.h" "include/QuantumV.h" "src/core/Window.cpp" "src/core/Window.h" "include/QuantumV/dll_header.h"   "include/QuantumV/core/Log.h" "src/core/Log.cpp" "include/QuantumV/core/Base.h" "src/render/IRenderer.h" "src/render/DX12Renderer.h" "src/render/DX12Renderer.cpp" "src/utils/Timer.h" "src/utils/Timer.cpp")
+	add_library(QuantumV SHARED "src/core/Application.cpp" "include/QuantumV/core/Application.h" "include/QuantumV/entry_point.h" "include/QuantumV.h" "src/core/Window.cpp" "src/core/Window.h" "include/QuantumV/dll_header.h"   "include/QuantumV/core/Log.h" "src/core/Log.cpp" "include/QuantumV/core/Base.h" "src/render/IRenderer.h" "src/render/DX12Renderer.h" "src/render/DX12Renderer.cpp" "src/utils/Timer.h" "src/utils/Timer.cpp" "src/render/d3dx12.h" "include/QuantumV/core/IEvent.h" "include/QuantumV/core/EventQueue.h" "include/QuantumV/core/EventDispatcher.h" "src/core/EventDispatcher.cpp" "src/core/EventProcessor.h" "src/core/EventProcessor.cpp")
 
 	target_include_directories(QuantumV PUBLIC include)
 	target_compile_definitions(QuantumV PUBLIC QV_SHARED PRIVATE QV_EXPORT $<$<CONFIG:Debug>:QV_DEBUG>) # public definitions
