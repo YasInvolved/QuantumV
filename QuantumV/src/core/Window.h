@@ -32,7 +32,7 @@ namespace QuantumV {
 		std::string title;
 		uint32_t width;
 		uint32_t height;
-		uint32_t flags = SDL_WINDOW_VULKAN | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
+		uint32_t flags = SDL_WINDOW_VULKAN | SDL_WINDOW_HIGH_PIXEL_DENSITY/* | SDL_WINDOW_RESIZABLE */; // remove due to buggy resize on dx12
 		WindowType type;
 	};
 }

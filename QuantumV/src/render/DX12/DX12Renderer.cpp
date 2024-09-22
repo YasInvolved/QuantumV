@@ -118,7 +118,7 @@ namespace QuantumV {
 		m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
 		// create root signature
-		std::array<CD3DX12_ROOT_PARAMETER, 1> rootParams;
+		std::array<CD3DX12_ROOT_PARAMETER, 1> rootParams = {};
 		rootParams[0].InitAsConstantBufferView(0);
 
 		D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
@@ -547,11 +547,7 @@ namespace QuantumV {
 			rtvHandle.Offset(m_rtvDescriptorSize);
 		}
 
-		m_viewport = CD3DX12_VIEWPORT(
-			0.0f, 0.0f,
-			static_cast<float>(new_width), static_cast<float>(new_height)
-		);
-		m_scissor = CD3DX12_RECT(0, 0, new_width, new_height);
+		SetViewport(0, 0, new_width, new_height);
 
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize.x = static_cast<float>(new_width);

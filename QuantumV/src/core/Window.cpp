@@ -17,8 +17,8 @@ namespace QuantumV {
 		}
 
 		auto display_mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
-		this->width = display_mode->w / 2;
-		this->height = display_mode->h / 2;
+		this->width = display_mode->w;
+		this->height = display_mode->h;
 
 		this->window_ptr = SDL_CreateWindow(title.c_str(), this->width, this->height, flags);
 	}

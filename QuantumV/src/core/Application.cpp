@@ -8,6 +8,7 @@
 #include <iostream>
 #include <imgui_impl_sdl3.h>
 #include "../render/ResizeEvent.h"
+#include "../render/Object.h"
 
 #ifdef QV_RENDERER_DX12
 #include "../render/DX12/DX12Renderer.h"
@@ -26,6 +27,9 @@ namespace QuantumV {
 		m_renderer = new DX12Renderer();
 		m_renderer->Init(m_window, m_window->getWidth(), m_window->getHeight());
 		m_renderer->SetViewport(0, 0, m_window->getWidth(), m_window->getHeight());
+
+		// TODO: Remove. It's just for test
+		Object testObject("assets/objects/test_torus.obj");
 	}
 
 	Application::~Application() {

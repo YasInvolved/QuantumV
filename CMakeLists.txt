@@ -12,10 +12,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_BIN}/lib")
 option(QV_STATIC "Build static library" OFF)
 option(QV_BUILD_SANDBOX "Build QuantumSandbox executable" ON)
 
+find_package(Vulkan REQUIRED)
+
 # dependencies
 add_subdirectory(3rdparty/SDL3)
 add_subdirectory(3rdparty/spdlog)
 add_subdirectory(3rdparty/D3D12MemoryAllocator)
+add_subdirectory(3rdparty/tinyobjloader)
+add_subdirectory(3rdparty/glm)
 
 add_library(imgui STATIC "3rdparty/imgui/imgui.cpp" "3rdparty/imgui/imgui_demo.cpp" "3rdparty/imgui/imgui_draw.cpp" "3rdparty/imgui/imgui_tables.cpp" "3rdparty/imgui/imgui_widgets.cpp" "3rdparty/imgui/backends/imgui_impl_dx12.cpp" "3rdparty/imgui/backends/imgui_impl_dx12.cpp" "3rdparty/imgui/backends/imgui_impl_sdl3.cpp")
 target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui" "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/imgui/backends")
