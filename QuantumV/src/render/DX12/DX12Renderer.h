@@ -2,15 +2,18 @@
 
 #ifdef QV_RENDERER_DX12
 
-#include "IRenderer.h"
+#include "../IRenderer.h"
 #include <Windows.h>
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
 #include <dxgi1_6.h>
+#include "d3dx12.h"
 #include <vector>
 #include <wrl/client.h>
 #include <D3D12MemAlloc.h>
-#include "../utils/Timer.h"
+#include "../../utils/Timer.h"
+// since another thread will access width, height, rtv etc. (resize event)
+#include <mutex>
 
 // for simplicity
 using namespace Microsoft::WRL;
@@ -20,9 +23,9 @@ namespace QuantumV {
 	public:
 		~DX12Renderer();
 
-		void Init(const Window* window, uint32_t width, uint32_t height) override;
+		void Init(Window* window, uint32_t width, uint32_t height) override;
 		void Clear(float r, float g, float b, float a) override;
-		//void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+		void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 		//void BindPipeline(Pipeline* pipeline) override;void Update()
 		void Draw(int vertex_count, int start_index = 0) override;
 
@@ -33,11 +36,12 @@ namespace QuantumV {
 		void Resize(uint32_t new_width, uint32_t new_height) override;
 
 	private:
+		std::mutex rtvMutex;
 		uint32_t m_width, m_height;
 		uint32_t m_currentFrameIndex = 0;
 		uint32_t m_rtvDescriptorSize;
-		const uint32_t m_frameCount = 3;
-		HWND m_hwnd;
+		uint32_t m_frameCount = 3;
+		Window* m_window;
 
 		ComPtr<IDXGIFactory7> m_factory;
 		ComPtr<IDXGIAdapter4> m_adapter;
@@ -72,6 +76,9 @@ namespace QuantumV {
 
 		ComPtr<ID3D12DescriptorHeap> m_imguiDescriptorHeap;
 
+		CD3DX12_VIEWPORT m_viewport;
+		CD3DX12_RECT m_scissor;
+
 		// camera variables
 		float m_eyePosition[3] = { 0.0f, 0.0f, -5.0f };
 		float m_focusPoint[3] = { 0.0f, 0.0f, 0.0f };
@@ -88,6 +95,7 @@ namespace QuantumV {
 
 		Utils::Timer m_frameTimer;
 
+		void TransitionResource(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 		void Update();
 		void WaitForPreviousFrame();
 	};

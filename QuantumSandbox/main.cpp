@@ -16,7 +16,7 @@ public:
 
 private:
 	void handleKeyboardEvent(QuantumV::KeyboardEvent* event) {
-		QV_CLIENT_TRACE("{} has been {}", event->GetScancode(), event->GetIsPressed() ? "pressed" : "released");
+		// QV_CLIENT_TRACE("{} has been {}", event->GetScancode(), event->GetIsPressed() ? "pressed" : "released");
 	}
 };
 
