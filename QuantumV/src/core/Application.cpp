@@ -7,11 +7,9 @@
 #include "Window.h"
 #include <iostream>
 #include <imgui_impl_sdl3.h>
+#include "../render/RenderAPI.h"
+#include "../render/IRenderer.h"
 #include "../render/ResizeEvent.h"
-#include "../render/Object.h"
-
-#ifdef QV_RENDERER_DX12
-#include "../render/DX12/DX12Renderer.h"
 
 namespace QuantumV {
 	Application::Application() {
@@ -23,13 +21,7 @@ namespace QuantumV {
 		m_eventQueue = new EventQueue();
 		m_dispatcher = new EventDispatcher(*this);
 
-		QV_CORE_TRACE("Chosen renderer: DX12");
-		m_renderer = new DX12Renderer();
-		m_renderer->Init(m_window, m_window->getWidth(), m_window->getHeight());
-		m_renderer->SetViewport(0, 0, m_window->getWidth(), m_window->getHeight());
-
-		// TODO: Remove. It's just for test
-		Object testObject("assets/objects/test_torus.obj");
+		m_renderer = IRenderer::CreateRenderer(QuantumV::Globals::preferredRenderingApi);
 	}
 
 	Application::~Application() {
@@ -73,7 +65,6 @@ namespace QuantumV {
 
 				ImGui_ImplSDL3_ProcessEvent(&event);
 			}
-			m_renderer->Draw(0, 0);
 		}
 
 		processor.Stop();
@@ -83,5 +74,3 @@ namespace QuantumV {
 		m_name = name;
 	}
 }
-
-#endif
