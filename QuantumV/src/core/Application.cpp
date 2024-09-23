@@ -5,13 +5,7 @@
 #include "../events/EventDispatcher.h"
 #include "../events/EventProcessor.h"
 #include "Window.h"
-#include <iostream>
-#include <imgui_impl_sdl3.h>
-#include "../render/ResizeEvent.h"
-#include "../render/Object.h"
-
-#ifdef QV_RENDERER_DX12
-#include "../render/DX12/DX12Renderer.h"
+#include "../render/RendererFactory.h"
 
 namespace QuantumV {
 	Application::Application() {
@@ -23,13 +17,7 @@ namespace QuantumV {
 		m_eventQueue = new EventQueue();
 		m_dispatcher = new EventDispatcher(*this);
 
-		QV_CORE_TRACE("Chosen renderer: DX12");
-		m_renderer = new DX12Renderer();
-		m_renderer->Init(m_window, m_window->getWidth(), m_window->getHeight());
-		m_renderer->SetViewport(0, 0, m_window->getWidth(), m_window->getHeight());
-
-		// TODO: Remove. It's just for test
-		Object testObject("assets/objects/test_torus.obj");
+		m_renderer = RendererFactory::CreateRenderer(m_window, preferredApi);
 	}
 
 	Application::~Application() {
@@ -61,19 +49,16 @@ namespace QuantumV {
 					break;
 
 				case SDL_EVENT_WINDOW_RESIZED:
-					m_eventQueue->PushEvent(
+					/*m_eventQueue->PushEvent(
 						std::make_unique<ResizeEvent>(
-							*m_renderer, 
-							static_cast<uint32_t>(event.display.data1), 
+							*m_renderer,
+							static_cast<uint32_t>(event.display.data1),
 							static_cast<uint32_t>(event.display.data2)
 						)
-					);
+					);*/
 					break;
 				}
-
-				ImGui_ImplSDL3_ProcessEvent(&event);
 			}
-			m_renderer->Draw(0, 0);
 		}
 
 		processor.Stop();
@@ -83,5 +68,3 @@ namespace QuantumV {
 		m_name = name;
 	}
 }
-
-#endif

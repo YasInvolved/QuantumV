@@ -21,8 +21,8 @@ namespace QuantumV {
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 
-		uint32_t getWidth() { return width; }
-		uint32_t getHeight() { return height; }
+		uint32_t getWidth() const { return width; }
+		uint32_t getHeight() const { return height; }
 		#ifdef QV_PLATFORM_WINDOWS
 		HWND getHWND() const { return reinterpret_cast<HWND>(SDL_GetPointerProperty(SDL_GetWindowProperties(this->window_ptr), SDL_PROP_WINDOW_WIN32_HWND_POINTER, 0)); }
 		#endif

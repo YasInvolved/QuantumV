@@ -23,7 +23,7 @@ namespace QuantumV {
 	private:
 		std::string m_name = "QuantumClient";
 		Window* m_window;
-		IRenderer* m_renderer;
+		Scope<IRenderer> m_renderer;
 	};
 
 	Application* CreateApplication();
