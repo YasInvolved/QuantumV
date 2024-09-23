@@ -10,6 +10,7 @@
 #include "../render/RenderAPI.h"
 #include "../render/IRenderer.h"
 #include "../render/ResizeEvent.h"
+#include "../render/IObject.h"
 
 namespace QuantumV {
 	Application::Application() {
@@ -21,7 +22,11 @@ namespace QuantumV {
 		m_eventQueue = new EventQueue();
 		m_dispatcher = new EventDispatcher(*this);
 
-		m_renderer = IRenderer::CreateRenderer(QuantumV::Globals::preferredRenderingApi);
+		m_renderer = IRenderer::CreateRenderer(QuantumV::Globals::preferredRenderingApi, m_window);
+		m_renderer->Init();
+
+		auto torus = IObject::CreateObject(m_renderer, "assets/objects/test_torus.obj");
+		torus->Load();
 	}
 
 	Application::~Application() {
@@ -63,7 +68,7 @@ namespace QuantumV {
 					break;
 				}
 
-				ImGui_ImplSDL3_ProcessEvent(&event);
+				// ImGui_ImplSDL3_ProcessEvent(&event);
 			}
 		}
 
