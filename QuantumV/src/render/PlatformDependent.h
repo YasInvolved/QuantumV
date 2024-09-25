@@ -12,9 +12,13 @@ enum class RenderAPI {
 #include <wrl/client.h>
 #include <d3d12.h>
 using D3D12ResourceComPtr = Microsoft::WRL::ComPtr<ID3D12Resource>;
+using D3D12VertexBufferView = D3D12_VERTEX_BUFFER_VIEW;
+using D3D12IndexBufferView = D3D12_INDEX_BUFFER_VIEW;
 constexpr RenderAPI preferredApi = RenderAPI::D3D12;
 #else
 using D3D12ResourceComPtr = std::monostate;
+using D3D12VertexBufferView = std::monstate;
+using D3D12IndexBufferView = std::monostate;
 constexpr RenderAPI preferredApi = RenderAPI::Vulkan;
 #endif
 
@@ -37,5 +41,29 @@ struct BufferHandle {
 
 	VkBuffer GetVulkanBuffer() const {
 		return std::get<VkBuffer>(buffer);
+	}
+};
+
+struct VertexBufferHandle : public BufferHandle {
+	std::variant<D3D12VertexBufferView, VkBufferView> view;
+
+	D3D12VertexBufferView GetD3D12VertexBufferView() const {
+		return std::get<D3D12VertexBufferView>(view);
+	}
+
+	VkBufferView GetVulkanVertexBufferView() const {
+		return std::get<VkBufferView>(view);
+	}
+};
+
+struct IndexBufferHandle : public BufferHandle {
+	std::variant<D3D12IndexBufferView, VkBufferView> view;
+
+	D3D12IndexBufferView GetD3D12IndexBufferView() const {
+		return std::get<D3D12IndexBufferView>(view);
+	}
+
+	VkBufferView GetVulkanIndexBufferView() const {
+		return std::get<VkBufferView>(view);
 	}
 };

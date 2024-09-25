@@ -5,10 +5,11 @@
 
 namespace QuantumV {
 	class IAllocator {
+	public:
 		virtual ~IAllocator() = default;
 
 		virtual BufferHandle AllocateBuffer(size_t size) = 0;
-		virtual BufferHandle AllocateVertexBuffer(size_t size) = 0;
-		virtual BufferHandle AllocateIndexBuffer(size_t size) = 0;
+		virtual VertexBufferHandle AllocateVertexBuffer(size_t size) = 0;
+		virtual IndexBufferHandle AllocateIndexBuffer(size_t size) = 0;
 	};
 }

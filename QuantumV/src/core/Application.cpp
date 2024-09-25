@@ -18,6 +18,7 @@ namespace QuantumV {
 		m_dispatcher = new EventDispatcher(*this);
 
 		m_renderer = RendererFactory::CreateRenderer(m_window, preferredApi);
+		m_renderer->Initialize();
 	}
 
 	Application::~Application() {
