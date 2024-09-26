@@ -10,7 +10,7 @@ endif()
 # platform dependent definitions
 if (MSVC)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_WINDOWS QV_RENDERER_DX12)
-	target_link_libraries(QuantumV PRIVATE "D3D12.lib" "dxgi.lib" "d3dcompiler.lib" D3D12MemoryAllocator)
+	target_link_libraries(QuantumV PRIVATE "d3d12.lib" "dxgi.lib" "d3dcompiler.lib" "dxguid.lib" D3D12MemoryAllocator)
 endif()
 if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)
@@ -20,7 +20,7 @@ target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui tinyobjloader glm
 
 add_custom_target(CompileShaders)
 
-set(SHADER_PATH_DX12 assets/shaders/dx12)
+set(SHADER_PATH_DX12 assets/shaders/d3d12)
 set(HLSL_SHADER_FILES ${SHADER_PATH_DX12}/VertexShader.hlsl ${SHADER_PATH_DX12}/PixelShader.hlsl)
 
 set_source_files_properties(${SHADER_PATH_DX12}/VertexShader.hlsl PROPERTIES ShaderType "vs_5_0")
