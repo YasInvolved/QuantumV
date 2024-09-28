@@ -26,8 +26,6 @@ constexpr RenderAPI preferredApi = RenderAPI::Vulkan;
 
 struct BufferHandle {
 	std::variant<D3D12ResourceComPtr, VkBuffer> buffer;
-	size_t size;
-	size_t stride;
 
 	constexpr bool isD3D12Buffer() const {
 		return std::holds_alternative<D3D12ResourceComPtr>(buffer);
@@ -49,7 +47,8 @@ struct BufferHandle {
 struct VertexBufferHandle : public BufferHandle {
 	std::variant<D3D12VertexBufferView, VkBufferView> view;
 
-	D3D12VertexBufferView GetD3D12VertexBufferView() const {
+	D3D12VertexBufferView GetD3D12VertexBufferView() const 
+	{
 		return std::get<D3D12VertexBufferView>(view);
 	}
 

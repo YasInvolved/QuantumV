@@ -6,6 +6,8 @@
 #include "../events/EventProcessor.h"
 #include "Window.h"
 #include "../render/RendererFactory.h"
+#include "../render/ObjectFactory.h"
+#include "../render/CameraFactory.h"
 
 namespace QuantumV {
 	Application::Application() {
@@ -19,6 +21,29 @@ namespace QuantumV {
 
 		m_renderer = RendererFactory::CreateRenderer(m_window, preferredApi);
 		m_renderer->Initialize();
+
+		auto camera = CameraFactory::CreateCamera(
+			m_renderer->GetAllocator(),
+			{ 0.0f, 0.0f, -3.0f },
+			{ 0.0f, 0.0f, 0.0f },
+			90.0f,
+			static_cast<float>(m_window->getWidth()),
+			static_cast<float>(m_window->getHeight())
+		);
+		m_renderer->AddCamera(camera);
+
+		auto cube_future = ObjectFactory::CreateObjectAsync("assets/models/cube.obj", m_renderer->GetAllocator());
+		auto torus_future = ObjectFactory::CreateObjectAsync("assets/models/torus.obj", m_renderer->GetAllocator());
+		
+		// wait for all objects to load
+		cube_future.wait();
+		torus_future.wait();
+		
+		auto cube = cube_future.get();
+		auto torus = torus_future.get();
+		cube->SetPositon(5.0f, 3.0f, 0.0f);
+		m_renderer->AddObject(torus);
+		m_renderer->AddObject(cube);
 	}
 
 	Application::~Application() {
@@ -60,6 +85,8 @@ namespace QuantumV {
 					break;
 				}
 			}
+
+			m_renderer->Draw();
 		}
 
 		processor.Stop();

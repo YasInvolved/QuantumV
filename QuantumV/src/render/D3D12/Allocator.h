@@ -18,6 +18,7 @@ namespace QuantumV::D3D12 {
 		BufferHandle AllocateBuffer(size_t size) override;
 		VertexBufferHandle AllocateVertexBuffer(size_t size) override;
 		IndexBufferHandle AllocateIndexBuffer(size_t size) override;
+		RenderAPI GetRenderAPI() override { return RenderAPI::D3D12; }
 	private:
 		D3D12MA::Allocator* m_allocator;
 		std::vector<D3D12MA::Allocation*> m_allocations;
