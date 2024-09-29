@@ -143,6 +143,39 @@ namespace QuantumV::D3D12 {
 		return handle;
 	}
 
+	ImageHandle Allocator::AllocateImage(size_t width, size_t height) {
+		ImageHandle handle = {};
+
+		D3D12_RESOURCE_DESC bufferDesc = {};
+		bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		bufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		bufferDesc.MipLevels = 1;
+		bufferDesc.DepthOrArraySize = 1;
+		bufferDesc.Width = width;
+		bufferDesc.Height = height;
+		bufferDesc.SampleDesc.Count = 1;
+		bufferDesc.SampleDesc.Quality = 0;
+		bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		D3D12MA::ALLOCATION_DESC allocDesc = {};
+		allocDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
+
+		D3D12ResourceComPtr image;
+		D3D12MA::Allocation* allocation = nullptr;
+		m_allocator->CreateResource(
+			&allocDesc,
+			&bufferDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			&allocation,
+			IID_PPV_ARGS(&image)
+		);
+
+		m_allocations.push_back(allocation);
+		handle.image = std::move(image);
+	}
+
 	void Allocator::GenerateMemoryDump() {
 		WCHAR* buffer;
 		m_allocator->BuildStatsString(&buffer, true);

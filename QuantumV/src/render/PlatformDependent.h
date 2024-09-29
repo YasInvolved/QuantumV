@@ -69,6 +69,26 @@ struct IndexBufferHandle : public BufferHandle {
 	}
 };
 
+struct ImageHandle {
+	std::variant<D3D12ResourceComPtr, VkImage> image;
+
+	constexpr bool isD3D12Image() const {
+		return std::holds_alternative<D3D12ResourceComPtr>(image);
+	}
+
+	constexpr bool isVulkanBuffer() const {
+		return std::holds_alternative<VkImage>(image);
+	}
+
+	D3D12ResourceComPtr GetD3D12Resource() const {
+		return std::get<D3D12ResourceComPtr>(image);
+	}
+
+	VkBuffer GetVulkanBuffer() const {
+		return std::get<VkImage>(image);
+	}
+};
+
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;

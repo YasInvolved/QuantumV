@@ -18,6 +18,7 @@ namespace QuantumV::D3D12 {
 		BufferHandle AllocateBuffer(size_t size) override;
 		VertexBufferHandle AllocateVertexBuffer(size_t size) override;
 		IndexBufferHandle AllocateIndexBuffer(size_t size) override;
+		ImageHandle AllocateImage(size_t width, size_t height) override;
 		void GenerateMemoryDump() override;
 		RenderAPI GetRenderAPI() override { return RenderAPI::D3D12; }
 	private:

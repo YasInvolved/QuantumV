@@ -8,8 +8,9 @@ else()
 		"include/QuantumV/dll_header.h" "include/QuantumV/core/Log.h" 
 		"src/core/Log.cpp" "include/QuantumV/core/Base.h" 
 		"src/utils/Timer.h" "src/utils/Timer.cpp" 
-		"include/QuantumV/events/IEvent.h" 
+		"include/QuantumV/events/IEvent.h"
 		"include/QuantumV/events/EventQueue.h" 
+		"include/QuantumV/util/stb_image.h"
 		"src/events/EventDispatcher.h" 
 		"src/events/EventDispatcher.cpp" 
 		"src/events/EventProcessor.h" 
@@ -31,7 +32,12 @@ else()
 		"src/render/D3D12/Object.cpp"
 		"src/render/D3D12/Renderer.h"
 		"src/render/D3D12/Renderer.cpp"
-	 "src/render/ICamera.h" "src/render/D3D12/Camera.h" "src/render/D3D12/Camera.cpp" "src/render/CameraFactory.h" "src/render/CameraFactory.cpp")
+		"src/render/ICamera.h" 
+		"src/render/D3D12/Camera.h" 
+		"src/render/D3D12/Camera.cpp" 
+		"src/render/CameraFactory.h" 
+		"src/render/CameraFactory.cpp"
+	)
 
 	target_include_directories(QuantumV PUBLIC include)
 	target_compile_definitions(QuantumV PUBLIC QV_SHARED $<$<CONFIG:Debug>:QV_DEBUG> PRIVATE QV_EXPORT) # public definitions

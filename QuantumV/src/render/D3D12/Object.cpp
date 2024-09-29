@@ -7,7 +7,7 @@ namespace QuantumV::D3D12 {
 		glm::mat4 modelMatrix;
 	};
 
-	Object::Object(const std::string& filepath, Ref<IAllocator> allocator)
+	Object::Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string&> materialPath)
 	{
 		{ // load object data
 			tinyobj::ObjReader reader;
@@ -61,6 +61,15 @@ namespace QuantumV::D3D12 {
 				}
 			}
 		} // load object data
+
+		// load material
+		if (materialPath.has_value()) {
+			int width, height, channels;
+			unsigned char* imageData = stbi_load(materialPath.value().c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			if (!imageData) {
+				QV_CORE_ERROR("Failed to load material");
+			}
+		}
 
 		// allocate buffers
 		const size_t cbSize = (sizeof(ConstantBuffer) + 255) & ~255;
