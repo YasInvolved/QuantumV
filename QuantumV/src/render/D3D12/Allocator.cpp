@@ -186,6 +186,7 @@ namespace QuantumV::D3D12 {
 			dumpFile << dump; // dunno this generation is a little bit broken on the library side
 		}
 		dumpFile.close();
+		m_allocator->FreeStatsString(buffer);
 	}
 }
 
