@@ -3,7 +3,7 @@
 #include "D3D12/Object.h"
 
 namespace QuantumV {
-	std::future<IObject*> ObjectFactory::CreateObjectAsync(const std::string& filepath, IAllocator* allocator) {
+	std::future<IObject*> ObjectFactory::CreateObjectAsync(const std::string& filepath, Ref<IAllocator> allocator) {
 		return std::async(std::launch::async, [filepath, allocator]() -> IObject* {
 			if (allocator->GetRenderAPI() == RenderAPI::D3D12) {
 				return new D3D12::Object(filepath, allocator);

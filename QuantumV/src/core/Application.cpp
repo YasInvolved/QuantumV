@@ -22,15 +22,15 @@ namespace QuantumV {
 		m_renderer = RendererFactory::CreateRenderer(m_window, preferredApi);
 		m_renderer->Initialize();
 
-		auto camera = CameraFactory::CreateCamera(
+		m_camera = CameraFactory::CreateCamera(
 			m_renderer->GetAllocator(),
-			{ 0.0f, 0.0f, -3.0f },
+			{ 0.0f, 3.0f, -5.0f },
 			{ 0.0f, 0.0f, 0.0f },
 			90.0f,
 			static_cast<float>(m_window->getWidth()),
 			static_cast<float>(m_window->getHeight())
 		);
-		m_renderer->AddCamera(camera);
+		m_renderer->AddCamera(m_camera);
 
 		auto cube_future = ObjectFactory::CreateObjectAsync("assets/models/cube.obj", m_renderer->GetAllocator());
 		auto torus_future = ObjectFactory::CreateObjectAsync("assets/models/torus.obj", m_renderer->GetAllocator());

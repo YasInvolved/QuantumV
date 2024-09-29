@@ -4,6 +4,8 @@
 
 #include "Allocator.h"
 #include <utility>
+#include <fstream>
+#include <QuantumV/core/Log.h>
 
 namespace QuantumV::D3D12 {
 	Allocator::Allocator(IDXGIAdapter4* adapter, ID3D12Device10* device) {
@@ -139,6 +141,18 @@ namespace QuantumV::D3D12 {
 		handle.view = std::move(view);
 
 		return handle;
+	}
+
+	void Allocator::GenerateMemoryDump() {
+		WCHAR* buffer;
+		m_allocator->BuildStatsString(&buffer, true);
+		std::wstring dump(&buffer[1]);
+		std::wofstream dumpFile("memdump_d3d12.json");
+		if (dumpFile.good()) {
+			QV_CORE_TRACE("Saving memory dump to: memdump_d3d12.json");
+			dumpFile << dump; // dunno this generation is a little bit broken on the library side
+		}
+		dumpFile.close();
 	}
 }
 

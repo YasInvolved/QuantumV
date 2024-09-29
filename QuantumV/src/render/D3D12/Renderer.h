@@ -24,7 +24,7 @@ namespace QuantumV::D3D12 {
 
 		void Initialize() override;
 		void Draw() override;
-		IAllocator* GetAllocator() override { return m_allocator.get(); }
+		Ref<IAllocator> GetAllocator() override { return m_allocator; }
 		void AddObject(IObject* object) override { m_objects.push_back(object); }
 		void AddCamera(ICamera* camera) override { m_camera = camera; }
 	private:
@@ -37,7 +37,7 @@ namespace QuantumV::D3D12 {
 		ComPtr<ID3D12RootSignature> m_rootSignature;
 
 		// memory
-		Scope<Allocator> m_allocator;
+		Ref<Allocator> m_allocator;
 		ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
 		size_t m_rtvDescSize = 0;
 

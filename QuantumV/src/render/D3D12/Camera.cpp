@@ -7,7 +7,7 @@ struct CameraBuffer {
 };
 
 namespace QuantumV::D3D12 {
-	Camera::Camera(IAllocator* allocator, glm::vec3 position, glm::vec3 focusPoint, float fov, float width, float height)
+	Camera::Camera(Ref<IAllocator> allocator, glm::vec3 position, glm::vec3 focusPoint, float fov, float width, float height)
 		: m_position(position), m_focusPoint(focusPoint), m_fov(fov), m_width(width), m_height(height)
 	{
 		const size_t bufferSize = (sizeof(CameraBuffer) + 255) & ~255;

@@ -7,7 +7,8 @@ namespace QuantumV::D3D12 {
 		glm::mat4 modelMatrix;
 	};
 
-	Object::Object(const std::string& filepath, IAllocator* allocator) {
+	Object::Object(const std::string& filepath, Ref<IAllocator> allocator)
+	{
 		{ // load object data
 			tinyobj::ObjReader reader;
 			tinyobj::ObjReaderConfig config = {};
