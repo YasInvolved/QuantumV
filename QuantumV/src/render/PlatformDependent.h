@@ -71,11 +71,12 @@ struct IndexBufferHandle : public BufferHandle {
 
 struct Vertex {
 	glm::vec3 position;
+	glm::vec3 normal;
 	glm::vec4 color;
 
 #ifdef QV_PLATFORM_WINDOWS
-	static constexpr std::array<D3D12_INPUT_ELEMENT_DESC, 2> GetElementDescDX12() noexcept {
-		constexpr std::array<D3D12_INPUT_ELEMENT_DESC, 2> desc = {
+	static constexpr std::array<D3D12_INPUT_ELEMENT_DESC, 3> GetElementDescDX12() noexcept {
+		constexpr std::array<D3D12_INPUT_ELEMENT_DESC, 3> desc = {
 			D3D12_INPUT_ELEMENT_DESC {
 				.SemanticName = "POSITION",
 				.SemanticIndex = 0,
@@ -86,11 +87,20 @@ struct Vertex {
 				.InstanceDataStepRate = 0
 			},
 			D3D12_INPUT_ELEMENT_DESC {
+				.SemanticName = "NORMAL",
+				.SemanticIndex = 0,
+				.Format = DXGI_FORMAT_R32G32B32_FLOAT,
+				.InputSlot = 0,
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+				.InstanceDataStepRate = 0
+			},
+			D3D12_INPUT_ELEMENT_DESC {
 				.SemanticName = "COLOR",
 				.SemanticIndex = 0,
 				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
 				.InputSlot = 0,
-				.AlignedByteOffset = sizeof(glm::vec3),
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
 				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
 				.InstanceDataStepRate = 0
 			}

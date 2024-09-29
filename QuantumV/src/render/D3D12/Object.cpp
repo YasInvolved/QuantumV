@@ -35,15 +35,26 @@ namespace QuantumV::D3D12 {
 					int fv = mesh.num_face_vertices[f];
 
 					for (size_t v = 0; v < fv; v++) {
+						Vertex vertex = {};
+
 						tinyobj::index_t idx = mesh.indices[index_offset + v];
-						tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
-						tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
-						tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+						vertex.position.x = attrib.vertices[3 * idx.vertex_index + 0];
+						vertex.position.y = attrib.vertices[3 * idx.vertex_index + 1];
+						vertex.position.z = attrib.vertices[3 * idx.vertex_index + 2];
 
-						m_vertices.push_back(Vertex{ {vx, vy, vz}, {1.0f, 0.0f, 0.0f, 1.0f} });
+						if (idx.normal_index >= 0) {
+							vertex.normal.x = attrib.normals[3 * idx.normal_index + 0];
+							vertex.normal.y = attrib.normals[3 * idx.normal_index + 1];
+							vertex.normal.z = attrib.normals[3 * idx.normal_index + 2];
+						}
+
+						// TODO: texcoords
+
+						// TODO: remove this color override
+						vertex.color = { 1.0f, 0.0f, 1.0f, 1.0f };
+
+						m_vertices.push_back(vertex);
 						m_indices.push_back(index_offset + v);
-
-						// TODO: normals and texcoords
 					}
 
 					index_offset += fv;
