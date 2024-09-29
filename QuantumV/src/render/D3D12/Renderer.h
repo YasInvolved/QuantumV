@@ -25,7 +25,7 @@ namespace QuantumV::D3D12 {
 		void Initialize() override;
 		void Draw() override;
 		Ref<IAllocator> GetAllocator() override { return m_allocator; }
-		void AddObject(IObject* object) override { m_objects.push_back(object); }
+		void AddObject(Ref<IObject> object) override { m_objects.push_back(object); }
 		void AddCamera(ICamera* camera) override { m_camera = camera; }
 	private:
 		const Window* m_window;
@@ -60,7 +60,7 @@ namespace QuantumV::D3D12 {
 		HANDLE m_renderEvent;
 
 		// objects
-		std::vector<IObject*> m_objects;
+		std::vector<Ref<IObject>> m_objects;
 
 		// camera
 		ICamera* m_camera;

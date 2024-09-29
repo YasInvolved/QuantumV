@@ -16,5 +16,8 @@ namespace QuantumV {
 		virtual BufferHandle GetConstantBuffer() = 0;
 		virtual void SetPositon(float x, float y, float z) = 0;
 		virtual void SetScale(float x, float y, float z) = 0;
+		virtual void Move(float delta_x, float delta_y, float delta_z) = 0;
+		virtual void Scale(float delta_x, float delta_y, float delta_z) = 0;
+		virtual void Rotate(float angle_x, float angle_y, float angle_z) = 0;
 	};
 }

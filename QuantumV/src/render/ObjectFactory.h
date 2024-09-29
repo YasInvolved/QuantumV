@@ -8,6 +8,6 @@
 namespace QuantumV {
 	class ObjectFactory {
 	public:
-		static std::future<IObject*> CreateObjectAsync(const std::string& filepath, Ref<IAllocator> allocator);
+		static std::future<Ref<IObject>> CreateObjectAsync(const std::string& filepath, Ref<IAllocator> allocator);
 	};
 }

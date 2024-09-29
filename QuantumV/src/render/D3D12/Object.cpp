@@ -99,7 +99,7 @@ namespace QuantumV::D3D12 {
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, m_translation);
 		model = glm::scale(model, m_scale);
-		// model = glm::rotate(model, 0.0f, m_rotation); // for future rotation on construction
+		model *= m_rotation;
 
 		ConstantBuffer buffer = { glm::transpose(model) };
 
@@ -107,5 +107,22 @@ namespace QuantumV::D3D12 {
 		assert(bufferData != nullptr);
 		memcpy(bufferData, &buffer, sizeof(ConstantBuffer));
 		m_cbHandle.GetD3D12Resource()->Unmap(0, nullptr);
+	}
+
+	void Object::Move(float delta_x, float delta_y, float delta_z) {
+		m_translation += glm::vec3(delta_x, delta_y, delta_z);
+		UpdateConstantBuffer();
+	}
+
+	void Object::Scale(float delta_x, float delta_y, float delta_z) {
+		m_scale += glm::vec3(delta_x, delta_y, delta_z);
+		UpdateConstantBuffer();
+	}
+
+	void Object::Rotate(float angle_x, float angle_y, float angle_z) {
+		m_rotation = glm::rotate(m_rotation, angle_x, { 1.0f, 0.0f, 0.0f });
+		m_rotation = glm::rotate(m_rotation, angle_y, { 0.0f, 1.0f, 0.0f });
+		m_rotation = glm::rotate(m_rotation, angle_z, { 0.0f, 0.0f, 1.0f });
+		UpdateConstantBuffer();
 	}
 }

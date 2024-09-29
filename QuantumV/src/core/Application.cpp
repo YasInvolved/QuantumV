@@ -10,6 +10,9 @@
 #include "../render/CameraFactory.h"
 
 namespace QuantumV {
+	static Ref<IObject> cube;
+	static Ref<IObject> torus;
+
 	Application::Application() {
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
 		m_window = new Window(m_name, WindowType::WINDOWED);
@@ -39,8 +42,8 @@ namespace QuantumV {
 		cube_future.wait();
 		torus_future.wait();
 		
-		auto cube = cube_future.get();
-		auto torus = torus_future.get();
+		cube = cube_future.get();
+		torus = torus_future.get();
 		cube->SetPositon(5.0f, 3.0f, 0.0f);
 		m_renderer->AddObject(torus);
 		m_renderer->AddObject(cube);
