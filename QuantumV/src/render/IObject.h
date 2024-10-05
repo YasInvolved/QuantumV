@@ -6,8 +6,6 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <optional>
-#define STB_IMAGE_IMPLEMENTATION
-#include <QuantumV/util/stb_image.h>
 #include <tiny_obj_loader.h>
 
 namespace QuantumV {

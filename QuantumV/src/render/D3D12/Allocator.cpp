@@ -174,6 +174,8 @@ namespace QuantumV::D3D12 {
 
 		m_allocations.push_back(allocation);
 		handle.image = std::move(image);
+
+		return handle;
 	}
 
 	void Allocator::GenerateMemoryDump() {

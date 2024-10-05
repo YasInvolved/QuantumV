@@ -84,7 +84,7 @@ struct ImageHandle {
 		return std::get<D3D12ResourceComPtr>(image);
 	}
 
-	VkBuffer GetVulkanBuffer() const {
+	VkImage GetVulkanBuffer() const {
 		return std::get<VkImage>(image);
 	}
 };

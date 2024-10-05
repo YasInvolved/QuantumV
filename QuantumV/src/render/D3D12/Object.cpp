@@ -1,13 +1,15 @@
 #include "Object.h"
 #include <QuantumV/core/Log.h>
 #include <glm/gtc/matrix_transform.hpp>
+#define STB_IMAGE_IMPLEMENTATION
+#include "../../utils/stb_image.h"
 
 namespace QuantumV::D3D12 {
 	struct ConstantBuffer {
 		glm::mat4 modelMatrix;
 	};
 
-	Object::Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string&> materialPath)
+	Object::Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string> materialPath)
 	{
 		{ // load object data
 			tinyobj::ObjReader reader;

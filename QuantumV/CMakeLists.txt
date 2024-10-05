@@ -10,7 +10,6 @@ else()
 		"src/utils/Timer.h" "src/utils/Timer.cpp" 
 		"include/QuantumV/events/IEvent.h"
 		"include/QuantumV/events/EventQueue.h" 
-		"include/QuantumV/util/stb_image.h"
 		"src/events/EventDispatcher.h" 
 		"src/events/EventDispatcher.cpp" 
 		"src/events/EventProcessor.h" 
@@ -37,6 +36,7 @@ else()
 		"src/render/D3D12/Camera.cpp" 
 		"src/render/CameraFactory.h" 
 		"src/render/CameraFactory.cpp"
+		"src/utils/stb_image.h"
 	)
 
 	target_include_directories(QuantumV PUBLIC include)

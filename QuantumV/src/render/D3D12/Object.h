@@ -6,7 +6,7 @@
 namespace QuantumV::D3D12 {
 	class Object : public IObject {
 	public:
-		Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string&> materialPath);
+		Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string> materialPath);
 
 		VertexBufferHandle GetVertexBuffer() override;
 		IndexBufferHandle GetIndexBuffer() override;
