@@ -201,6 +201,16 @@ namespace QuantumV::D3D12 {
 		dumpFile.close();
 		m_allocator->FreeStatsString(buffer);
 	}
+
+	void Allocator::Free(BufferHandle buffer) {
+		auto allocation = m_allocations[buffer.allocationId];
+		allocation->Release();
+	}
+
+	void Allocator::Free(ImageHandle image) {
+		auto allocation = m_allocations[image.allocationId];
+		allocation->Release();
+	}
 }
 
 #endif

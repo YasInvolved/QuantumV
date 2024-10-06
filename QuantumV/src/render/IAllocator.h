@@ -14,5 +14,7 @@ namespace QuantumV {
 		virtual ImageHandle AllocateImage(size_t width, size_t height) = 0;
 		virtual void GenerateMemoryDump() = 0;
 		virtual RenderAPI GetRenderAPI() = 0;
+		virtual void Free(BufferHandle buffer) = 0;
+		virtual void Free(ImageHandle image) = 0;
 	};
 }

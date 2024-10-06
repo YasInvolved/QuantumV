@@ -21,6 +21,8 @@ namespace QuantumV::D3D12 {
 		ImageHandle AllocateImage(size_t width, size_t height) override;
 		void GenerateMemoryDump() override;
 		RenderAPI GetRenderAPI() override { return RenderAPI::D3D12; }
+		void Free(BufferHandle buffer) override;
+		void Free(ImageHandle image) override;
 	private:
 		D3D12MA::Allocator* m_allocator;
 		std::unordered_map<xg::Guid, D3D12MA::Allocation*> m_allocations;
