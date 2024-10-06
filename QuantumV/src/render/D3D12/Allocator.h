@@ -7,7 +7,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <D3D12MemAlloc.h>
-#include <vector>
+#include <unordered_map>
 
 namespace QuantumV::D3D12 {
 	class Allocator : public IAllocator {
@@ -23,7 +23,7 @@ namespace QuantumV::D3D12 {
 		RenderAPI GetRenderAPI() override { return RenderAPI::D3D12; }
 	private:
 		D3D12MA::Allocator* m_allocator;
-		std::vector<D3D12MA::Allocation*> m_allocations;
+		std::unordered_map<xg::Guid, D3D12MA::Allocation*> m_allocations;
 	};
 }
 
