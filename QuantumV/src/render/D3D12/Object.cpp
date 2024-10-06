@@ -10,6 +10,7 @@ namespace QuantumV::D3D12 {
 	};
 
 	Object::Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string> materialPath)
+		: m_allocator(allocator)
 	{
 		{ // load object data
 			tinyobj::ObjReader reader;
@@ -75,9 +76,9 @@ namespace QuantumV::D3D12 {
 
 		// allocate buffers
 		const size_t cbSize = (sizeof(ConstantBuffer) + 255) & ~255;
-		m_vbHandle = allocator->AllocateVertexBuffer(sizeof(Vertex) * m_vertices.size());
-		m_ibHandle = allocator->AllocateIndexBuffer(sizeof(uint32_t) * m_indices.size());
-		m_cbHandle = allocator->AllocateBuffer(cbSize);
+		m_vbHandle = m_allocator->AllocateVertexBuffer(sizeof(Vertex) * m_vertices.size());
+		m_ibHandle = m_allocator->AllocateIndexBuffer(sizeof(uint32_t) * m_indices.size());
+		m_cbHandle = m_allocator->AllocateBuffer(cbSize);
 
 		void* bufferData;
 		m_vbHandle.GetD3D12Resource()->Map(0, nullptr, &bufferData);
@@ -91,6 +92,12 @@ namespace QuantumV::D3D12 {
 		m_ibHandle.GetD3D12Resource()->Unmap(0, nullptr);
 		
 		UpdateConstantBuffer();
+	}
+
+	Object::~Object() {
+		m_allocator->Free(m_vbHandle);
+		m_allocator->Free(m_ibHandle);
+		m_allocator->Free(m_cbHandle);
 	}
 
 	VertexBufferHandle Object::GetVertexBuffer() {
