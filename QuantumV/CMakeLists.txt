@@ -37,7 +37,7 @@ else()
 		"src/render/CameraFactory.h" 
 		"src/render/CameraFactory.cpp"
 		"src/utils/stb_image.h"
-	)
+	 )
 
 	target_include_directories(QuantumV PUBLIC include)
 	target_compile_definitions(QuantumV PUBLIC QV_SHARED $<$<CONFIG:Debug>:QV_DEBUG> PRIVATE QV_EXPORT) # public definitions
@@ -52,7 +52,7 @@ if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)
 endif()
 
-target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui tinyobjloader glm::glm volk::volk PUBLIC spdlog::spdlog)
+target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui tinyobjloader glm::glm volk::volk crossguid PUBLIC spdlog::spdlog)
 
 add_custom_target(CompileShaders)
 

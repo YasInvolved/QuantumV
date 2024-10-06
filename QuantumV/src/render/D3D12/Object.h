@@ -7,6 +7,7 @@ namespace QuantumV::D3D12 {
 	class Object : public IObject {
 	public:
 		Object(const std::string& filepath, const Ref<IAllocator> allocator, std::optional<const std::string> materialPath);
+		~Object();
 
 		VertexBufferHandle GetVertexBuffer() override;
 		IndexBufferHandle GetIndexBuffer() override;
@@ -17,6 +18,7 @@ namespace QuantumV::D3D12 {
 		void Scale(float delta_x, float delta_y, float delta_z) override;
 		void Rotate(float angle_x, float angle_y, float angle_z) override;
 	private:
+		Ref<IAllocator> m_allocator;
 		VertexBufferHandle m_vbHandle;
 		IndexBufferHandle m_ibHandle;
 		BufferHandle m_cbHandle;

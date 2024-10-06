@@ -2,8 +2,8 @@
 
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
-#include <variant>
 #include <array>
+#include <crossguid/guid.hpp>
 
 enum class RenderAPI {
 	D3D12,
@@ -19,13 +19,14 @@ using D3D12IndexBufferView = D3D12_INDEX_BUFFER_VIEW;
 constexpr RenderAPI preferredApi = RenderAPI::D3D12;
 #else
 using D3D12ResourceComPtr = std::monostate;
-using D3D12VertexBufferView = std::monstate;
+using D3D12VertexBufferView = std::monostate;
 using D3D12IndexBufferView = std::monostate;
 constexpr RenderAPI preferredApi = RenderAPI::Vulkan;
 #endif
 
 struct BufferHandle {
 	std::variant<D3D12ResourceComPtr, VkBuffer> buffer;
+	xg::Guid allocationId;
 
 	constexpr bool isD3D12Buffer() const {
 		return std::holds_alternative<D3D12ResourceComPtr>(buffer);
@@ -71,6 +72,7 @@ struct IndexBufferHandle : public BufferHandle {
 
 struct ImageHandle {
 	std::variant<D3D12ResourceComPtr, VkImage> image;
+	xg::Guid allocationId;
 
 	constexpr bool isD3D12Image() const {
 		return std::holds_alternative<D3D12ResourceComPtr>(image);

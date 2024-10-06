@@ -18,7 +18,7 @@ namespace QuantumV::D3D12 {
 
 	Allocator::~Allocator() {
 		for (const auto& allocation : m_allocations) {
-			allocation->Release();
+			allocation.second->Release();
 		}
 		m_allocator->Release();
 	}
@@ -51,9 +51,12 @@ namespace QuantumV::D3D12 {
 			&allocation,
 			IID_PPV_ARGS(&buffer)
 		);
-		m_allocations.push_back(allocation);
+		auto allocationId = xg::newGuid();
+
+		m_allocations.emplace(std::make_pair(allocationId, allocation));
 
 		handle.buffer = std::move(buffer);
+		handle.allocationId = allocationId;
 		return handle;
 	}
 
@@ -86,8 +89,11 @@ namespace QuantumV::D3D12 {
 				&allocation,
 				IID_PPV_ARGS(&buffer)
 			);
-			m_allocations.push_back(allocation);
+			auto allocationId = xg::newGuid();
+
+			m_allocations.emplace(std::make_pair(allocationId, allocation));
 			handle.buffer = std::move(buffer);
+			handle.allocationId = allocationId;
 		}
 
 		D3D12VertexBufferView view = {};
@@ -129,8 +135,11 @@ namespace QuantumV::D3D12 {
 				&allocation,
 				IID_PPV_ARGS(&buffer)
 			);
-			m_allocations.push_back(allocation);
+			auto allocationId = xg::newGuid();
+
+			m_allocations.emplace(std::make_pair(allocationId, allocation));
 			handle.buffer = std::move(buffer);
+			handle.allocationId = allocationId;
 		}
 
 		D3D12IndexBufferView view = {};
@@ -171,9 +180,11 @@ namespace QuantumV::D3D12 {
 			&allocation,
 			IID_PPV_ARGS(&image)
 		);
+		auto allocationId = xg::newGuid();
 
-		m_allocations.push_back(allocation);
+		m_allocations.emplace(std::make_pair(allocationId, allocation));
 		handle.image = std::move(image);
+		handle.allocationId = allocationId;
 
 		return handle;
 	}
@@ -189,6 +200,16 @@ namespace QuantumV::D3D12 {
 		}
 		dumpFile.close();
 		m_allocator->FreeStatsString(buffer);
+	}
+
+	void Allocator::Free(BufferHandle buffer) {
+		auto allocation = m_allocations[buffer.allocationId];
+		allocation->Release();
+	}
+
+	void Allocator::Free(ImageHandle image) {
+		auto allocation = m_allocations[image.allocationId];
+		allocation->Release();
 	}
 }
 
