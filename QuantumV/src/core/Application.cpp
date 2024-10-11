@@ -32,6 +32,7 @@ namespace QuantumV {
 		else {
 			m_renderer = std::make_unique<Vulkan::Renderer>(*m_window);
 		}
+		m_renderer->Init();
 
 		// create and start async event processor
 		EventProcessor processor(*m_eventQueue, *m_dispatcher);
