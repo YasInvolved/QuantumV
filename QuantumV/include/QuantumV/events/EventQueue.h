@@ -14,6 +14,10 @@ namespace QuantumV {
 		std::condition_variable m_condition;
 
 	public:
+		// prevent copying
+		EventQueue(const EventQueue&) = delete;
+		EventQueue& operator=(const EventQueue&) = delete;
+
 		void PushEvent(std::unique_ptr<IEvent> event);
 		std::unique_ptr<IEvent> PopEvent();
 	};
