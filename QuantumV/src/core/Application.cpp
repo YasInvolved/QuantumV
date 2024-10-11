@@ -1,7 +1,6 @@
 #include "QuantumV/core/Application.h"
 #include "QuantumV/core/Log.h"
 #include <QuantumV/events/EventQueue.h>
-#include <QuantumV/events/KeyboardEvent.h>
 #include "Window.h"
 #include "../events/EventDispatcher.h"
 #include "../events/EventProcessor.h"
@@ -13,7 +12,7 @@ namespace QuantumV {
 		QV_CORE_TRACE("Created application window: {0} {1}x{2}", m_name, m_window->getWidth(), m_window->getHeight());
 
 		QV_CORE_TRACE("Creating event handlers");
-		m_eventQueue = std::make_shared<EventQueue>();
+		m_eventQueue = std::make_unique<EventQueue>();
 		m_dispatcher = std::make_unique<EventDispatcher>(*this);
 	}
 
@@ -42,21 +41,9 @@ namespace QuantumV {
 						running = false;
 						break;
 					}
-					m_eventQueue->PushEvent(
-						std::make_unique<KeyboardEvent>(
-							event.key.key, event.key.down
-						)
-					);
 					break;
 
 				case SDL_EVENT_WINDOW_RESIZED:
-					/*m_eventQueue->PushEvent(
-						std::make_unique<ResizeEvent>(
-							*m_renderer,
-							static_cast<uint32_t>(event.display.data1),
-							static_cast<uint32_t>(event.display.data2)
-						)
-					);*/
 					break;
 				}
 			}

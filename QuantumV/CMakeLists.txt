@@ -15,8 +15,6 @@ else()
 		"src/events/EventProcessor.h" 
 		"src/events/EventProcessor.cpp" 
 		"src/events/EventQueue.cpp" 
-		"include/QuantumV/events/KeyboardEvent.h" 
-		"src/events/KeyboardEvent.cpp" 
 		"src/utils/stb_image.h"
 	 )
 

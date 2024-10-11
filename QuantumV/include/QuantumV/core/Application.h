@@ -7,7 +7,6 @@
 namespace QuantumV {
 	class Window;
 	class EventDispatcher;
-	class ICamera;
 
 	class QV_API Application {
 	public:
@@ -21,8 +20,7 @@ namespace QuantumV {
 	private:
 		std::string m_name = "QuantumClient";
 		Scope<Window> m_window;
-		ICamera* m_camera;
-		Ref<EventQueue> m_eventQueue;
+		Scope<EventQueue> m_eventQueue;
 		Scope<EventDispatcher> m_dispatcher;
 	};
 
