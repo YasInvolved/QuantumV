@@ -4,6 +4,8 @@
 #include "Window.h"
 #include "../events/EventDispatcher.h"
 #include "../events/EventProcessor.h"
+#include <QuantumV/render/D3D12/D3D12Renderer.h>
+#include <QuantumV/render/Vulkan/VulkanRenderer.h>
 
 namespace QuantumV {
 	Application::Application() {
@@ -23,6 +25,13 @@ namespace QuantumV {
 	void Application::Run() {
 		bool running = true;
 		SDL_Event event;
+
+		if (preferredAPI == GraphicsAPI::D3D12) {
+			m_renderer = std::make_unique<D3D12::Renderer>(*m_window);
+		}
+		else {
+			m_renderer = std::make_unique<Vulkan::Renderer>(*m_window);
+		}
 
 		// create and start async event processor
 		EventProcessor processor(*m_eventQueue, *m_dispatcher);

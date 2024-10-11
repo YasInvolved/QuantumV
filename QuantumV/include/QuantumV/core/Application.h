@@ -3,6 +3,7 @@
 #include "Base.h"
 #include <string>
 #include <QuantumV/events/EventQueue.h>
+#include <QuantumV/render/BaseRenderer.h>
 
 namespace QuantumV {
 	class Window;
@@ -22,6 +23,7 @@ namespace QuantumV {
 		Scope<Window> m_window;
 		Scope<EventQueue> m_eventQueue;
 		Scope<EventDispatcher> m_dispatcher;
+		Scope<BaseRenderer> m_renderer;
 	};
 
 	Application* CreateApplication();
