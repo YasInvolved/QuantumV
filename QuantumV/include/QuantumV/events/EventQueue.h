@@ -15,6 +15,7 @@ namespace QuantumV {
 
 	public:
 		// prevent copying
+		EventQueue() = default;
 		EventQueue(const EventQueue&) = delete;
 		EventQueue& operator=(const EventQueue&) = delete;
 

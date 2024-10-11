@@ -6,7 +6,6 @@
 
 namespace QuantumV {
 	class Window;
-	class IRenderer;
 	class EventDispatcher;
 	class ICamera;
 
@@ -19,13 +18,12 @@ namespace QuantumV {
 		void Run();
 	protected:
 		void SetName(const std::string& name);
-		EventQueue* m_eventQueue;
-		EventDispatcher* m_dispatcher;
 	private:
 		std::string m_name = "QuantumClient";
-		Window* m_window;
-		Scope<IRenderer> m_renderer;
+		Scope<Window> m_window;
 		ICamera* m_camera;
+		Ref<EventQueue> m_eventQueue;
+		Scope<EventDispatcher> m_dispatcher;
 	};
 
 	Application* CreateApplication();
