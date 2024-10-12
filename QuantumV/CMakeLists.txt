@@ -16,7 +16,19 @@ else()
 		"src/events/EventProcessor.cpp" 
 		"src/events/EventQueue.cpp" 
 		"src/utils/stb_image.h"
-	  "include/QuantumV/render/BaseRenderer.h" "include/QuantumV/render/D3D12/D3D12Renderer.h" "src/render/D3D12/D3D12Renderer.cpp" "include/QuantumV/render/Vulkan/VulkanRenderer.h" "src/render/Vulkan/VulkanRenderer.cpp" "include/QuantumV/resources/Resource.h" "include/QuantumV/resources/Texture.h" "include/QuantumV/resources/Mesh.h" "include/QuantumV/resources/ResourceManager.h" "src/resources/ResourceManager.cpp" "src/resources/Mesh.cpp" "src/resources/Texture.cpp")
+	  "include/QuantumV/render/BaseRenderer.h" 
+	  "include/QuantumV/render/D3D12/D3D12Renderer.h" 
+	  "src/render/D3D12/D3D12Renderer.cpp" 
+	  "include/QuantumV/render/Vulkan/VulkanRenderer.h" 
+	  "src/render/Vulkan/VulkanRenderer.cpp" 
+	  "include/QuantumV/resources/Resource.h" 
+	  "include/QuantumV/resources/Texture.h" 
+	  "include/QuantumV/resources/Mesh.h"
+	  "include/QuantumV/resources/ResourceManager.h" 
+	  "src/resources/ResourceManager.cpp" 
+	  "src/resources/Mesh.cpp" 
+	  "src/resources/Texture.cpp"
+	)
 
 	target_include_directories(QuantumV PUBLIC include)
 	target_compile_definitions(QuantumV PUBLIC QV_SHARED $<$<CONFIG:Debug>:QV_DEBUG> PRIVATE QV_EXPORT) # public definitions
@@ -31,4 +43,4 @@ if (LINUX)
 	target_compile_definitions(QuantumV PUBLIC QV_PLATFORM_LINUX QV_RENDERER_VULKAN)
 endif()
 
-target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui tinyobjloader glm::glm volk::volk crossguid PUBLIC spdlog::spdlog)
+target_link_libraries(QuantumV PRIVATE SDL3::SDL3-shared imgui tinyobjloader volk::volk crossguid PUBLIC spdlog::spdlog glm::glm)

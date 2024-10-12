@@ -9,7 +9,7 @@
 #include <mutex>
 
 namespace QuantumV {
-	class ResourceManager {
+	class QV_API ResourceManager {
 	public:
 		ResourceManager() = default;
 		ResourceManager(const ResourceManager&) = delete;
@@ -17,10 +17,12 @@ namespace QuantumV {
 
 		template <typename T>
 		Ref<T> loadResource(const std::string& name, const std::string& filePath) {
-			std::lock_guard<std::mutex>(m_resourceMutex);
+			std::lock_guard<std::mutex> lock(m_resourceMutex);
+
+			const std::type_info& typeInfo = typeid(T);
 			auto it = m_resources.find(name);
 			if (it != m_resources.end()) {
-				if (m_resourceTypes[name] != std::type_index(typeid(T))) {
+				if (m_resourceTypes[name] != &typeInfo) {
 					QV_CORE_ERROR("Resource {} already loaded with a different type", name);
 					return nullptr;
 				}
@@ -30,7 +32,7 @@ namespace QuantumV {
 
 			auto resource = std::make_shared<T>();
 			try {
-				resource->Load();
+				resource->Load(filePath);
 			}
 			catch (const std::exception& e) {
 				QV_CLIENT_ERROR("Failed to load resource {0}: {1}", name, e.what());
@@ -38,7 +40,7 @@ namespace QuantumV {
 			}
 
 			m_resources[name] = resource;
-			m_resourceTypes[name] = std::type_index(typeid(T));
+			m_resourceTypes[name] = &typeInfo;
 		}
 
 		void unloadResource(const std::string& name);
@@ -46,6 +48,6 @@ namespace QuantumV {
 	private:
 		std::mutex m_resourceMutex;
 		std::unordered_map<std::string, Ref<Resource>> m_resources;
-		std::unordered_map<std::string, std::type_index> m_resourceTypes;
+		std::unordered_map<std::string, const std::type_info*> m_resourceTypes;
 	};
 }

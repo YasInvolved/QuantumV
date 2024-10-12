@@ -19,13 +19,13 @@ namespace QuantumV {
 		void Run();
 	protected:
 		Scope<BaseRenderer> m_renderer;
+		Scope<ResourceManager> m_resourceManager;
 		void SetName(const std::string& name);
 	private:
 		std::string m_name = "QuantumClient";
 		Scope<Window> m_window;
 		Scope<EventQueue> m_eventQueue;
 		Scope<EventDispatcher> m_dispatcher;
-		Scope<ResourceManager> m_resourceManager;
 	};
 
 	Application* CreateApplication();
