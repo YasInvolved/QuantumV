@@ -4,6 +4,7 @@
 #include <string>
 #include <QuantumV/events/EventQueue.h>
 #include <QuantumV/render/BaseRenderer.h>
+#include <QuantumV/resources/ResourceManager.h>
 
 namespace QuantumV {
 	class Window;
@@ -24,6 +25,7 @@ namespace QuantumV {
 		Scope<Window> m_window;
 		Scope<EventQueue> m_eventQueue;
 		Scope<EventDispatcher> m_dispatcher;
+		Scope<ResourceManager> m_resourceManager;
 	};
 
 	Application* CreateApplication();

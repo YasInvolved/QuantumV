@@ -27,6 +27,7 @@ namespace QuantumV::D3D12 {
 
 		// enable debug layers if running in debug mode
 		#ifdef QV_DEBUG
+		constexpr uint32_t createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
 		{
 			if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&s_d3d12DebugInterface)))) {
 				s_d3d12DebugInterface->EnableDebugLayer();
@@ -34,11 +35,13 @@ namespace QuantumV::D3D12 {
 
 			DXGIGetDebugInterface1(0, IID_PPV_ARGS(&s_dxgiDebugInterface));
 		}
+		#else
+		constexpr uint32_t createFactoryFlags = 0;
 		#endif
 
 		// create factory
 		QV_CORE_TRACE("Creating DXGI Factory");
-		result = CreateDXGIFactory(IID_PPV_ARGS(&m_factory));
+		result = CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&m_factory));
 		if (FAILED(result)) {
 			QV_CORE_CRITICAL("Failed to cerate DXGI factory. Result code: {:d}", result);
 			return;

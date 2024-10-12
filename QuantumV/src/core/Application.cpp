@@ -13,9 +13,20 @@ namespace QuantumV {
 		m_window = std::make_unique<Window>(m_name, WindowType::WINDOWED);
 		QV_CORE_TRACE("Created application window: {0} {1}x{2}", m_name, m_window->getWidth(), m_window->getHeight());
 
-		QV_CORE_TRACE("Creating event handlers");
+		QV_CORE_TRACE("Starting event system");
 		m_eventQueue = std::make_unique<EventQueue>();
 		m_dispatcher = std::make_unique<EventDispatcher>(*this);
+
+		if (preferredAPI == GraphicsAPI::D3D12) {
+			m_renderer = std::make_unique<D3D12::Renderer>(*m_window);
+		}
+		else {
+			m_renderer = std::make_unique<Vulkan::Renderer>(*m_window);
+		}
+		m_renderer->Init();
+
+		QV_CORE_TRACE("Creating resource manager");
+		m_resourceManager = std::make_unique<ResourceManager>();
 	}
 
 	Application::~Application() {
@@ -25,14 +36,6 @@ namespace QuantumV {
 	void Application::Run() {
 		bool running = true;
 		SDL_Event event;
-
-		if (preferredAPI == GraphicsAPI::D3D12) {
-			m_renderer = std::make_unique<D3D12::Renderer>(*m_window);
-		}
-		else {
-			m_renderer = std::make_unique<Vulkan::Renderer>(*m_window);
-		}
-		m_renderer->Init();
 
 		// create and start async event processor
 		EventProcessor processor(*m_eventQueue, *m_dispatcher);
