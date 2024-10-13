@@ -41,6 +41,8 @@ namespace QuantumV {
 
 			m_resources[name] = resource;
 			m_resourceTypes[name] = &typeInfo;
+
+			return resource;
 		}
 
 		void unloadResource(const std::string& name);
